@@ -1,0 +1,2 @@
+# AlphaGo
+AlphaGo in PyQt
