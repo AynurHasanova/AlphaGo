@@ -8,8 +8,8 @@ class Board(QFrame):  # base the board on a QFrame widget
     clickLocationSignal = pyqtSignal(str) # signal sent when there is a new click location
 
     # TODO set the board width and height to be square
-    boardWidth  = 0     # board is 0 squares wide # TODO this needs updating
-    boardHeight = 0     #
+    boardWidth  = 13     # board is 0 squares wide # TODO this needs updating
+    boardHeight = 13     #
     timerSpeed  = 1     # the timer updates ever 1 second
     counter     = 10    # the number the counter will count down from
 
@@ -23,7 +23,16 @@ class Board(QFrame):  # base the board on a QFrame widget
         self.isStarted = False      # game is not currently started
         self.start()                # start the game which will start the timer
 
-        self.boardArray =[]         # TODO - create a 2d int/Piece array to store the state of the game
+        # TODO - create a 2d int/Piece array to store the state of the game
+        self.boardArray = [[2,0,2,0,2,0,2,0],
+                           [0,2,0,2,0,2,0,2],
+                           [2,0,2,0,2,0,2,0],
+                           [0,0,0,0,0,0,0,0],
+                           [0,0,0,0,0,0,0,0],
+                           [0,1,0,1,0,1,0,1],
+                           [1,0,1,0,1,0,1,0],
+                           [0,1,0,1,0,1,0,1]
+                           ]
         # self.printBoardArray()    # TODO - uncomment this method after create the array above
 
     def printBoardArray(self):
@@ -56,7 +65,7 @@ class Board(QFrame):  # base the board on a QFrame widget
             if Board.counter == 0:
                 print("Game over")
             self.counter -= 1
-            print('timerEvent()', self.counter)
+          #  print('timerEvent()', self.counter)
             self.updateTimerSignal.emit(self.counter)
         else:
             super(Board, self).timerEvent(event)      # if we do not handle an event we should pass it to the super
@@ -64,9 +73,9 @@ class Board(QFrame):  # base the board on a QFrame widget
 
     def paintEvent(self, event):
         '''paints the board and the pieces of the game'''
-        # painter = QPainter(self)
-        # self.drawBoardSquares(painter)
-        # self.drawPieces(painter)
+        painter = QPainter(self)
+        self.drawBoardSquares(painter)
+        self.drawPieces(painter)
 
     def mousePressEvent(self, event):
         '''this event is automatically called when the mouse is pressed'''
@@ -91,7 +100,8 @@ class Board(QFrame):  # base the board on a QFrame widget
                 colTransformation = self.squareWidth()* col # TODO set this value equal the transformation in the column direction
                 rowTransformation = 0                       # TODO set this value equal the transformation in the row direction
                 painter.translate(colTransformation,rowTransformation)
-                painter.fillRect()                          # TODO provide the required arguments
+                painter.fillRect(Board.boardWidth, Board.boardHeight, self.squareWidth(), self.squareHeight(),
+                                 painter.brush())                          # TODO provide the required arguments
                 painter.restore()
                 # TODO change the colour of the brush so that a checkered board is drawn
 
@@ -100,12 +110,27 @@ class Board(QFrame):  # base the board on a QFrame widget
         colour = Qt.transparent # empty square could be modeled with transparent pieces
         for row in range(0, len(self.boardArray)):
             for col in range(0, len(self.boardArray[0])):
+                colTransformation = col * self.squareWidth()  # Todo set this value equal the transformation you would like in the column direction
+                rowTransformation = row * self.squareHeight()  # Todo set this value equal the transformation you would like in the column direction
+                print(colTransformation)
+                print(rowTransformation)
                 painter.save()
-                painter.translate()
+                painter.translate(colTransformation, rowTransformation)
+                #Todo choose your colour and set the painter brush to the correct colour
+                if self.boardArray[row][col] == 1:
+                    colour = Qt.black
+                elif self.boardArray[row][col] == 2:
+                    colour = Qt.white
+                else:
+                    colour = Qt.transparent
+                painter.setBrush(colour)
 
-                # TODO draw some the pieces as ellipses
-                # TODO choose your colour and set the painter brush to the correct colour
-                radius = (self.squareWidth() - 2) / 2
-                center = QPoint(radius, radius)
-                painter.drawEllipse(center, radius, radius)
+
+                # Todo draw some the pieces as elipses
+                radius1 = (self.squareWidth() - 2) / 2
+                radius2 = (self.squareHeight() - 2) / 2
+                # print(radius)
+                center = QPoint(radius1, radius2)
+                print(center)
+                painter.drawEllipse(center, radius1, radius2)
                 painter.restore()

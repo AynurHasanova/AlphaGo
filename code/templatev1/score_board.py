@@ -40,13 +40,13 @@ class ScoreBoard(QDockWidget):
     def setClickLocation(self, clickLoc):
         '''updates the label to show the click location'''
         self.label_clickLocation.setText("Click Location:" + clickLoc)
-        print('slot ' + clickLoc)
+       # print('slot ' + clickLoc)
 
     @pyqtSlot(int)
     def setTimeRemaining(self, timeRemainng):
         '''updates the time remaining label to show the time remaining'''
         update = "Time Remaining:" + str(timeRemainng)
         self.label_timeRemaining.setText(update)
-        print('slot '+update)
+     #   print('slot '+update)
         # self.redraw()
 
