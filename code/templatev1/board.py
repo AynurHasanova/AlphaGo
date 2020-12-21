@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QFrame
 from PyQt5.QtCore import Qt, QBasicTimer, pyqtSignal, QPoint
-from PyQt5.QtGui import QPainter
+from PyQt5.QtGui import QPainter, QBrush
 from piece import Piece
 
 class Board(QFrame):  # base the board on a QFrame widget
@@ -24,16 +24,21 @@ class Board(QFrame):  # base the board on a QFrame widget
         self.start()                # start the game which will start the timer
 
         # TODO - create a 2d int/Piece array to store the state of the game
-        self.boardArray = [[2,0,2,0,2,0,2,0],
-                           [0,2,0,2,0,2,0,2],
-                           [2,0,2,0,2,0,2,0],
-                           [0,0,0,0,0,0,0,0],
-                           [0,0,0,0,0,0,0,0],
-                           [0,1,0,1,0,1,0,1],
-                           [1,0,1,0,1,0,1,0],
-                           [0,1,0,1,0,1,0,1]
+        self.boardArray = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                           [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                           [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                           [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                           [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                           [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                           [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                           [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                           [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                           [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                           [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                           [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                           [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
                            ]
-        # self.printBoardArray()    # TODO - uncomment this method after create the array above
+        self.printBoardArray()    # TODO - uncomment this method after create the array above
 
     def printBoardArray(self):
         '''prints the boardArray in an attractive way'''
@@ -94,15 +99,24 @@ class Board(QFrame):  # base the board on a QFrame widget
     def drawBoardSquares(self, painter):
         '''draw all the square on the board'''
         # TODO set the default colour of the brush
+        painter.setBrush(QBrush(Qt.white, Qt.SolidPattern))
+
         for row in range(0, Board.boardHeight):
             for col in range (0, Board.boardWidth):
                 painter.save()
-                colTransformation = self.squareWidth()* col # TODO set this value equal the transformation in the column direction
-                rowTransformation = 0                       # TODO set this value equal the transformation in the row direction
-                painter.translate(colTransformation,rowTransformation)
-                painter.fillRect(Board.boardWidth, Board.boardHeight, self.squareWidth(), self.squareHeight(),
-                                 painter.brush())                          # TODO provide the required arguments
+                colTransformation = self.squareWidth() * col  # TODO set this value equal the transformation in the column direction
+                rowTransformation = self.squareWidth() * row  # TODO set this value equal the transformation in the row direction
+                painter.translate(colTransformation, rowTransformation)
+
+                painter.drawRect(0, 0, self.squareWidth(), self.squareHeight())
+                firstLine = self.width() / 3
+                secondLine = firstLine * 2
+                painter.drawLine(firstLine, 0, secondLine, self.squareHeight())
+                painter.drawLine(secondLine, 0, secondLine, self.squareHeight())
+
+               # painter.fillRect(Board.boardWidth, Board.boardHeight, self.squareWidth(), self.squareWidth(), painter.brush())
                 painter.restore()
+                #painter.setBrush(QBrush(Qt.white, Qt.SolidPattern))
                 # TODO change the colour of the brush so that a checkered board is drawn
 
     def drawPieces(self, painter):
@@ -112,8 +126,8 @@ class Board(QFrame):  # base the board on a QFrame widget
             for col in range(0, len(self.boardArray[0])):
                 colTransformation = col * self.squareWidth()  # Todo set this value equal the transformation you would like in the column direction
                 rowTransformation = row * self.squareHeight()  # Todo set this value equal the transformation you would like in the column direction
-                print(colTransformation)
-                print(rowTransformation)
+                print("colTransformation", colTransformation)
+                print("rowTransformation", rowTransformation)
                 painter.save()
                 painter.translate(colTransformation, rowTransformation)
                 #Todo choose your colour and set the painter brush to the correct colour
