@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import QFrame
-from PyQt5.QtCore import Qt, QBasicTimer, pyqtSignal, QPoint
+from PyQt5.QtCore import Qt, QBasicTimer, pyqtSignal, QPoint, pyqtSlot
 from PyQt5.QtGui import QPainter, QBrush
 from piece import Piece
 
@@ -8,8 +8,8 @@ class Board(QFrame):  # base the board on a QFrame widget
     clickLocationSignal = pyqtSignal(str) # signal sent when there is a new click location
 
     # TODO set the board width and height to be square
-    boardWidth  = 13     # board is 0 squares wide # TODO this needs updating
-    boardHeight = 13     #
+    boardWidth  = 7     # board is 0 squares wide # TODO this needs updating
+    boardHeight = 7     #
     timerSpeed  = 1     # the timer updates ever 1 second
     counter     = 10    # the number the counter will count down from
 
@@ -24,19 +24,13 @@ class Board(QFrame):  # base the board on a QFrame widget
         self.start()                # start the game which will start the timer
 
         # TODO - create a 2d int/Piece array to store the state of the game
-        self.boardArray = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                           [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                           [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                           [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                           [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                           [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                           [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                           [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                           [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                           [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                           [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                           [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                           [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        self.boardArray = [[0, 0, 0, 0, 0, 0, 0],
+                           [0, 0, 0, 0, 0, 0, 0],
+                           [0, 0, 0, 0, 0, 0, 0],
+                           [0, 0, 0, 0, 0, 0, 0],
+                           [0, 0, 0, 0, 0, 0, 0],
+                           [0, 0, 0, 0, 0, 0, 0],
+                           [0, 0, 0, 0, 0, 0, 0]
                            ]
         self.printBoardArray()    # TODO - uncomment this method after create the array above
 
@@ -148,3 +142,12 @@ class Board(QFrame):  # base the board on a QFrame widget
                 print(center)
                 painter.drawEllipse(center, radius1, radius2)
                 painter.restore()
+
+    @pyqtSlot(int)
+    def resetSignal(self, action):
+        '''receives signal from score board'''
+        update = "Received action :" + str(action)
+        if action == 0:
+            print("Reset signal received")
+        else:
+            print("Pass signal received")
