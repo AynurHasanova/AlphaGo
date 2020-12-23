@@ -1,6 +1,7 @@
 from PyQt5.QtWidgets import QFrame
 from PyQt5.QtCore import Qt, QBasicTimer, pyqtSignal, QPoint, pyqtSlot
 from PyQt5.QtGui import QPainter, QBrush
+from math import floor
 from piece import Piece
 
 class Board(QFrame):  # base the board on a QFrame widget
@@ -8,8 +9,8 @@ class Board(QFrame):  # base the board on a QFrame widget
     clickLocationSignal = pyqtSignal(str) # signal sent when there is a new click location
 
     # TODO set the board width and height to be square
-    boardWidth  = 7     # board is 0 squares wide # TODO this needs updating
-    boardHeight = 7     #
+    boardWidth  = 6     # board is 0 squares wide # TODO this needs updating
+    boardHeight = 6     #
     timerSpeed  = 1     # the timer updates ever 1 second
     counter     = 10    # the number the counter will count down from
 
@@ -41,6 +42,7 @@ class Board(QFrame):  # base the board on a QFrame widget
 
     def mousePosToColRow(self, event):
         '''convert the mouse click event to a row and column'''
+        # print("mousePosToColRow: " + self.squareWidth() / event.pos().x())
 
     def squareWidth(self):
         '''returns the width of one square in the board'''
@@ -78,10 +80,19 @@ class Board(QFrame):  # base the board on a QFrame widget
 
     def mousePressEvent(self, event):
         '''this event is automatically called when the mouse is pressed'''
-        clickLoc = "click location ["+str(event.x())+","+str(event.y())+"]"     # the location where a mouse click was registered
-        print("mousePressEvent() - "+clickLoc)
+        #clickLoc = "click location ["+str(event.x())+","+str(event.y())+"]"     # the location where a mouse click was registered
+        #print("mousePressEvent() - "+clickLoc)
         # TODO you could call some game logic here
+        #self.clickLocationSignal.emit(clickLoc)
+
+        col = (int)(event.x() / self.squareWidth())
+        row = (int)(event.y() / self.squareHeight())
+
+        clickLoc = "click location ["+str(event.x())+","+str(event.y())+"] -> " + str(col) + ", " + str(row)
         self.clickLocationSignal.emit(clickLoc)
+
+        print("Calculated row: {}, col: {}", row, col)
+        self.boardArray[row][col] = 1 # TODO change the value depending on the player colour
 
     def resetGame(self):
         '''clears pieces from the board'''
@@ -105,6 +116,7 @@ class Board(QFrame):  # base the board on a QFrame widget
                 painter.drawRect(0, 0, self.squareWidth(), self.squareHeight())
                 firstLine = self.width() / 3
                 secondLine = firstLine * 2
+                print("self.width(): {}, firstLine: {}, secondLine: {}, self.squareWidth(): {}".format(self.width(), firstLine, secondLine, self.squareWidth()))
                 painter.drawLine(firstLine, 0, secondLine, self.squareHeight())
                 painter.drawLine(secondLine, 0, secondLine, self.squareHeight())
 
@@ -120,25 +132,27 @@ class Board(QFrame):  # base the board on a QFrame widget
             for col in range(0, len(self.boardArray[0])):
                 colTransformation = col * self.squareWidth()  # Todo set this value equal the transformation you would like in the column direction
                 rowTransformation = row * self.squareHeight()  # Todo set this value equal the transformation you would like in the column direction
-                print("colTransformation", colTransformation)
-                print("rowTransformation", rowTransformation)
-                painter.save()
-                painter.translate(colTransformation, rowTransformation)
+              #  print("colTransformation", colTransformation)
+              #  print("rowTransformation", rowTransformation)
+
                 #Todo choose your colour and set the painter brush to the correct colour
                 if self.boardArray[row][col] == 1:
                     colour = Qt.black
                 elif self.boardArray[row][col] == 2:
                     colour = Qt.white
                 else:
-                    colour = Qt.transparent
+                    continue
+
+                painter.save()
+                painter.translate(colTransformation, rowTransformation)
                 painter.setBrush(colour)
 
-
                 # Todo draw some the pieces as elipses
-                radius1 = (self.squareWidth() - 2) / 2
-                radius2 = (self.squareHeight() - 2) / 2
-                # print(radius)
-                center = QPoint(radius1, radius2)
+                radius1 = (self.squareWidth() - 2) / 8
+                radius2 = (self.squareHeight() - 2) / 8
+                print("self.squareWidth(): {}, self.squareHeight(): {}, radius1: {}, radius2: {}".format(
+                      self.squareWidth(), self.squareHeight(), radius1, radius2))
+                center = QPoint(colTransformation, rowTransformation)
                 print(center)
                 painter.drawEllipse(center, radius1, radius2)
                 painter.restore()
