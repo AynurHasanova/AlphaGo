@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QDockWidget, QVBoxLayout, QWidget, QLabel, QPushButton #TODO import additional Widget classes as desired
+from PyQt5.QtWidgets import QDockWidget, QVBoxLayout, QWidget, QLabel, QPushButton   #TODO import additional Widget classes as desired
 from PyQt5.QtCore import pyqtSlot, pyqtSignal
 
 class ScoreBoard(QDockWidget):
