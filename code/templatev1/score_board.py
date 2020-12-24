@@ -36,6 +36,9 @@ class ScoreBoard(QDockWidget):
 
         self.mainLayout.addWidget(self.resetButton)
 
+        #self.setFixedHeight(600)
+        #self.setFixedWidth(300)
+
         self.show()
 
     def center(self):

@@ -24,7 +24,6 @@ class Go(QMainWindow):
         self.addDockWidget(Qt.RightDockWidgetArea, self.scoreBoard)
         self.scoreBoard.make_connection(self.board)
 
-
         # Open help document
         openAction = QAction(QIcon('help.png'), '&Help', self)
         openAction.setShortcut('Ctrl+H')
@@ -45,8 +44,9 @@ class Go(QMainWindow):
         fileMenu.addAction(openAction)
         fileMenu.addAction(exitAction)
 
-        self.setMinimumSize(QSize(300, 100))
-        self.resize(800, 800)
+        self.resize(600, 600)
+        #self.setFixedHeight(600)
+        #self.setFixedWidth(600)
         self.center()
         self.setWindowTitle('Go')
         self.show()
