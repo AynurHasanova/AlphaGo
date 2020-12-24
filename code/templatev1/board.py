@@ -116,8 +116,8 @@ class Board(QFrame):  # base the board on a QFrame widget
         #print("mousePressEvent() - "+clickLoc)
         # TODO you could call some game logic here
 
-        col = (int)(self.roundUp(event.x(), 50) / self.squareWidth())
-        row = (int)(self.roundUp(event.y(), 50) / self.squareHeight())
+        col = (int)(self.roundUp(event.x(), self.SQUARE_SIZE) / self.squareWidth())
+        row = (int)(self.roundUp(event.y(), self.SQUARE_SIZE) / self.squareHeight())
 
         clickLoc = "click loc: ["+str(event.x())+","+str(event.y())+"] -> " + str(row) + ", " + str(col)
         self.clickLocationSignal.emit(clickLoc)
@@ -139,22 +139,13 @@ class Board(QFrame):  # base the board on a QFrame widget
 
     def drawSquares(self, painter):
         # Draw horizontal lines
-        painter.drawLine(50, 50, 350, 50)
-        painter.drawLine(50, 100, 350, 100)
-        painter.drawLine(50, 150, 350, 150)
-        painter.drawLine(50, 200, 350, 200)
-        painter.drawLine(50, 250, 350, 250)
-        painter.drawLine(50, 300, 350, 300)
-        painter.drawLine(50, 350, 350, 350)
+        # Draw vertical lines
+        for i in range(1, self.boardWidth + 1):
+            painter.drawLine(self.SQUARE_SIZE, self.SQUARE_SIZE * i, self.boardWidth * self.SQUARE_SIZE, self.SQUARE_SIZE * i)
 
         # Draw vertical lines
-        painter.drawLine(50, 50, 50, 350)
-        painter.drawLine(100, 50, 100, 350)
-        painter.drawLine(150, 50, 150, 350)
-        painter.drawLine(200, 50, 200, 350)
-        painter.drawLine(250, 50, 250, 350)
-        painter.drawLine(300, 50, 300, 350)
-        painter.drawLine(350, 50, 350, 350)
+        for i in range(1, self.boardWidth + 1):
+            painter.drawLine(self.SQUARE_SIZE * i, self.SQUARE_SIZE, self.SQUARE_SIZE * i, self.boardWidth * self.SQUARE_SIZE)
 
     def drawPieces(self, painter):
         '''draw the prices on the board'''
