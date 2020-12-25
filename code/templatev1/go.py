@@ -8,16 +8,16 @@ class Go(QMainWindow):
 
     def __init__(self):
         super().__init__()
-        self.initUI()
+        self.init_ui()
 
-    def getBoard(self):
+    def get_board(self):
         return self.board
 
-    def getScoreBoard(self):
+    def get_score_board(self):
         return self.scoreBoard
 
-    def initUI(self):
-        '''initiates application UI'''
+    def init_ui(self):
+        """initiates application UI"""
         self.board = Board(self)
         self.setCentralWidget(self.board)
         self.scoreBoard = ScoreBoard()
@@ -25,24 +25,24 @@ class Go(QMainWindow):
         self.scoreBoard.make_connection(self.board)
 
         # Open help document
-        openAction = QAction(QIcon('help.png'), '&Help', self)
-        openAction.setShortcut('Ctrl+H')
-        openAction.setStatusTip('Open help')
-        openAction.triggered.connect(self.openCall)
+        help_action = QAction(QIcon('help.png'), '&Help', self)
+        help_action.setShortcut('Ctrl+H')
+        help_action.setStatusTip('Open help')
+        help_action.triggered.connect(self.help_call)
 
         # Create exit action
-        exitAction = QAction(QIcon('exit.png'), '&Exit', self)
-        exitAction.setShortcut('Ctrl+Q')
-        exitAction.setStatusTip('Exit application')
-        exitAction.triggered.connect(self.exitCall)
+        exit_action = QAction(QIcon('exit.png'), '&Exit', self)
+        exit_action.setShortcut('Ctrl+Q')
+        exit_action.setStatusTip('Exit application')
+        exit_action.triggered.connect(self.exit_call)
 
         # Create menu bar with actions
-        menubar = self.menuBar()
+        menu_bar = self.menuBar()
         # menu does not work on MacOS without setNativeMenuBar(False)
-        menubar.setNativeMenuBar(False)
-        fileMenu = menubar.addMenu('&File')
-        fileMenu.addAction(openAction)
-        fileMenu.addAction(exitAction)
+        menu_bar.setNativeMenuBar(False)
+        file_menu = menu_bar.addMenu('&File')
+        file_menu.addAction(help_action)
+        file_menu.addAction(exit_action)
 
         self.resize(600, 600)
         #self.setFixedHeight(600)
@@ -51,8 +51,8 @@ class Go(QMainWindow):
         self.setWindowTitle('Go')
         self.show()
 
-    def openCall(self):
-        userGuide = """Go("encircling game") is an abstract strategy board game for two players, in which the aim is to surround more territory than the opponent.The game was invented in China over 3, 000 years ago and is therefore believed to be the oldest board game continuously played today.It was considered one of the four essential arts of the cultured aristocratic Chinese scholars in antiquity.Despite its relatively simple rules, Go is very complex, even more so than chess.Computers have only recently been capable of beating human masters.Have a look at the following for more details: https: // deepmind.com / research / alphago / Movement: Black
+    def help_call(self):
+        user_guide = """Go("encircling game") is an abstract strategy board game for two players, in which the aim is to surround more territory than the opponent.The game was invented in China over 3, 000 years ago and is therefore believed to be the oldest board game continuously played today.It was considered one of the four essential arts of the cultured aristocratic Chinese scholars in antiquity.Despite its relatively simple rules, Go is very complex, even more so than chess.Computers have only recently been capable of beating human masters.Have a look at the following for more details: https: // deepmind.com / research / alphago / Movement: Black
         plays first, with black and white taking turns.A stone can be placed at any unoccupied intersection of the board with limited exceptions.
         
         Suicide Rule: You cannot place a stone which will immediately have no liberties.
@@ -61,29 +61,30 @@ class Go(QMainWindow):
         m35s. """
 
         print('Help')
-        helpWindow = QDialog(self)
-        tb = QTextEdit(helpWindow)
+        help_window = QDialog(self)
+        tb = QTextEdit(help_window)
         tb.resize(350, 250)
         tb.setReadOnly(True)
-        tb.setText(userGuide)
+        tb.setText(user_guide)
         tb.setAlignment(Qt.AlignLeft)
-        helpWindow.setWindowTitle("Help")
-        helpWindow.setFixedHeight(260)
-        helpWindow.setFixedWidth(360)
-        helpWindow.show()
+        help_window.setWindowTitle("Help")
+        help_window.setFixedHeight(260)
+        help_window.setFixedWidth(360)
+        help_window.show()
 
-    def exitCall(self):
+    def exit_call(self):
         print('Exiting game')
 
-        buttonReply = QMessageBox.question(self, 'Exit Confirmation', "Exit Game?", QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
-        if buttonReply == QMessageBox.Yes:
+        exit_btn = QMessageBox.question(self, 'Exit Confirmation', "Exit Game?", QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        if exit_btn == QMessageBox.Yes:
             self.close()
 
-    def clickMethod(self):
+    @staticmethod
+    def click_method():
         print('PyQt')
 
     def center(self):
-        '''centers the window on the screen'''
+        """centers the window on the screen"""
         screen = QDesktopWidget().screenGeometry()
         size = self.geometry()
         self.move((screen.width() - size.width()) / 2,(screen.height() - size.height()) / 2)

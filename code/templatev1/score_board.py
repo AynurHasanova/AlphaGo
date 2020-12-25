@@ -1,75 +1,93 @@
-from PyQt5.QtWidgets import QDockWidget, QVBoxLayout, QWidget, QLabel, QPushButton   #TODO import additional Widget classes as desired
+from PyQt5.QtWidgets import QDockWidget, QVBoxLayout, QWidget, QLabel, QPushButton
 from PyQt5.QtCore import pyqtSlot, pyqtSignal
 
+
 class ScoreBoard(QDockWidget):
-    '''# base the score_board on a QDockWidget'''
+    """# base the score_board on a QDockWidget"""
 
     resetSignal = pyqtSignal(int) # signal sent when there is a new click location
 
     def __init__(self):
         super().__init__()
-        self.initUI()
+        self.init_ui()
 
-    def initUI(self):
-        '''initiates ScoreBoard UI'''
+    def init_ui(self):
+        """initiates ScoreBoard UI"""
         self.resize(200, 200)
         self.center()
         self.setWindowTitle('ScoreBoard')
-        #create a widget to hold other widgets
-        self.mainWidget = QWidget()
-        self.mainLayout = QVBoxLayout()
+        # create a widget to hold other widgets
+        self.main_widget = QWidget()
+        self.main_layout = QVBoxLayout()
 
         #create two labels which will be updated by signals
         self.label_clickLocation = QLabel("Click Location: ")
-        self.label_timeRemaining = QLabel("Time remaining: ")
-        self.mainWidget.setLayout(self.mainLayout)
-        self.mainLayout.addWidget(self.label_clickLocation)
-        self.mainLayout.addWidget(self.label_timeRemaining)
-        self.setWidget(self.mainWidget)
+        self.label_nextPlayer = QLabel("Next Player: ")
+        self.label_player_points = QLabel("Player Points: ")
+        self.label_timeRemaining = QLabel("Time Remaining: ")
+        self.main_widget.setLayout(self.main_layout)
+        self.main_layout.addWidget(self.label_clickLocation)
+        self.main_layout.addWidget(self.label_nextPlayer)
+        self.main_layout.addWidget(self.label_player_points)
+        self.main_layout.addWidget(self.label_timeRemaining)
+        self.setWidget(self.main_widget)
 
-        self.passButton = QPushButton("Pass", self.mainWidget)
-        self.mainLayout.addWidget(self.passButton)
-        self.passButton.clicked.connect(self.passAction)
+        self.pass_button = QPushButton("Pass", self.main_widget)
+        self.main_layout.addWidget(self.pass_button)
+        self.pass_button.clicked.connect(self.pass_action)
 
-        self.resetButton = QPushButton("Reset", self.mainWidget)
-        self.resetButton.clicked.connect(self.resetAction)
+        self.reset_button = QPushButton("Reset", self.main_widget)
+        self.reset_button.clicked.connect(self.reset_action)
 
-        self.mainLayout.addWidget(self.resetButton)
+        self.main_layout.addWidget(self.reset_button)
 
-        #self.setFixedHeight(600)
-        #self.setFixedWidth(300)
+        # self.setFixedHeight(600)
+        # self.setFixedWidth(300)
 
         self.show()
 
     def center(self):
-        '''centers the window on the screen, you do not need to implement this method'''
+        """centers the window on the screen, you do not need to implement this method"""
 
     def make_connection(self, board):
-        '''this handles a signal sent from the board class'''
-        # when the clickLocationSignal is emitted in board the setClickLocation slot receives it
-        board.clickLocationSignal.connect(self.setClickLocation)
-        # when the updateTimerSignal is emitted in the board the setTimeRemaining slot receives it
-        board.updateTimerSignal.connect(self.setTimeRemaining)
-        self.resetSignal.connect(board.resetSignal)
+        """this handles a signal sent from the board class"""
+        # when the click_location_signal is emitted in board the set_click_location slot receives it
+        board.click_location_signal.connect(self.set_click_location)
+        # when the click_location_signal is emitted in board the set_click_location slot receives it
+        board.next_player_colour_signal.connect(self.set_next_player_colour)
+        # get points from board.py
+        board.points_signal.connect(self.set_player_points)
+        # when the update_timer_signal is emitted in the board the set_time_remaining slot receives it
+        board.update_timer_signal.connect(self.set_time_remaining)
+        self.resetSignal.connect(board.reset_signal)
 
     @pyqtSlot(str) # checks to make sure that the following slot is receiving an argument of the type 'int'
-    def setClickLocation(self, clickLoc):
-        '''updates the label to show the click location'''
-        self.label_clickLocation.setText("Click Location:" + clickLoc)
-       # print('slot ' + clickLoc)
+    def set_click_location(self, click_loc):
+        """updates the label to show the latest click location"""
+        self.label_clickLocation.setText("Location: " + click_loc)
+        # print('slot ' + click_loc)
+
+    @pyqtSlot(str)
+    def set_next_player_colour(self, next_player):
+        """updates the label to show the next player name/colour"""
+        self.label_nextPlayer.setText("Next Player: " + next_player)
+
+    @pyqtSlot(str)
+    def set_player_points(self, points):
+        self.label_player_points.setText("Points: " + points)
 
     @pyqtSlot(int)
-    def setTimeRemaining(self, timeRemainng):
-        '''updates the time remaining label to show the time remaining'''
-        update = "Time Remaining:" + str(timeRemainng)
+    def set_time_remaining(self, time_remainng):
+        """updates the time remaining label to show the time remaining"""
+        update = "Time Remaining:" + str(time_remainng)
         self.label_timeRemaining.setText(update)
-     #   print('slot '+update)
+        # print('slot '+update)
         # self.redraw()
 
-    def passAction(self):
-       print("Pass button clicked")
-       self.resetSignal.emit(1)
+    def pass_action(self):
+        print("Pass button clicked")
+        self.resetSignal.emit(1)
 
-    def resetAction(self):
-       print("Reset button clicked")
-       self.resetSignal.emit(0)
+    def reset_action(self):
+        print("Reset button clicked")
+        self.resetSignal.emit(0)
