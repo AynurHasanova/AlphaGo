@@ -98,15 +98,15 @@ class Board(QFrame):  # base the board on a QFrame widget
 
         click_loc = "["+str(row) + ", " + str(col) + "]"
         self.click_location_signal.emit(click_loc)
-        self.next_player_colour_signal.emit(self.game_logic.next_player_colour)
+        self.next_player_colour_signal.emit(self.game_logic.nextPlayerColour)
 
         if (0 < row < 8) and (0 < col < 8):
-            if not self.game_logic.try_move(row - 1, col - 1):
-                print("try_move({}, {}) failed".format(row-1, col-1))
+            if not self.game_logic.tryMove(row - 1, col - 1):
+                print("tryMove({}, {}) failed".format(row-1, col-1))
         else:
             print("Out-of-band Calculated row: {}, col: {}", row, col)
 
-        self.points_signal.emit(self.game_logic.player_points)
+        self.points_signal.emit(self.game_logic.playerPoints)
 
     def draw_squares(self, painter):
         # Draw horizontal lines
@@ -154,5 +154,5 @@ class Board(QFrame):  # base the board on a QFrame widget
             self.next_player_colour_signal.emit("BLACK")
         else:
             print("Pass signal received")
-            self.game_logic.change_player_turn(True)
-            self.next_player_colour_signal.emit(self.game_logic.next_player_colour)
+            self.game_logic.changePlayerTurn(True)
+            self.next_player_colour_signal.emit(self.game_logic.nextPlayerColour)

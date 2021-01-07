@@ -7,8 +7,7 @@ from utils import Player
 
 
 class Board(QFrame):
-    # TODO Board default values
-
+    # Board default values
     # This is size of each cells of squares on the Go Board
     SQUARE_SIZE = 50
     EMPTY = 0
@@ -24,8 +23,8 @@ class Board(QFrame):
         WHITE,
     )
 
-    # TODO Main Signals
-    points_signal = pyqtSignal(str)  # used to send points to the score_board
+    # All the App's signals
+    pointsSignal = pyqtSignal(str)  # used to send points to the score_board
     updateTimerSignal = pyqtSignal(int)  # signal sent when timer is updated
     clickLocationSignal = pyqtSignal(str)  # signal sent when there is a new click location
     nextPlayerColourSignal = pyqtSignal(str)  # signal sent with the next player name
@@ -36,7 +35,7 @@ class Board(QFrame):
 
 
     def init_board(self, board_width):
-        # The First player is always a black
+        # start with a black player
         self.turn = self.BLACK
 
         # create a timer for the game
@@ -47,8 +46,7 @@ class Board(QFrame):
         self.board_array = [[0 for _ in range(board_width)] for _ in range(board_width)]
         self.game_logic = GameLogic(self.board_array)
 
-        self.printBoardArray()  # TODO - uncomment this method after create the array above
-        # self.game_logic = game_logic(self.boardArray)
+        self.printBoardArray()
 
         # TODO - Is this necessary, I thought scores in Go is computed after the game is over
         # Player scores by core
@@ -58,26 +56,19 @@ class Board(QFrame):
         # }
 
         self.start()  # start the game which will start the timer
-        # TODO - create a 2d int/Piece array to store the state of the game
 
     def printBoardArray(self):
         """ prints the board_array in an attractive way """
         print("board_array:")
         print('\n'.join(['\t'.join([str(cell) for cell in row]) for row in self.board_array]))
 
-    def mousePosToColRow(self, event):
-        """ convert the mouse click event to a row and column """
-        # print("mousePosToColRow: " + self.squareWidth() / event.pos().x())
-
     def squareWidth(self):
         """ returns the width of one square in the board """
         return self.SQUARE_SIZE
-        # return self.contentsRect().width() / self.boardWidth
 
     def squareHeight(self):
         """ returns the height of one square of the board """
         return self.SQUARE_SIZE
-        # return self.contentsRect().height() / self.boardHeight
 
     def start(self):
         """ Starts game """
@@ -96,7 +87,6 @@ class Board(QFrame):
             if Board.counter == 0:
                 print("Game over")
             self.counter -= 1
-            #  print('timerEvent()', self.counter)
             self.updateTimerSignal.emit(self.counter)
         else:
             super(Board, self).timerEvent(event)  # if we do not handle an event we should pass it to the super
@@ -114,42 +104,31 @@ class Board(QFrame):
 
     def mousePressEvent(self, event):
         """ This event is automatically called when the mouse is pressed """
-
-        # print("mousePressEvent() - "+clickLoc)
-        # TODO you could call some game logic here
-
         col = int(self.roundUp(event.x(), self.SQUARE_SIZE) / self.squareWidth())
         row = int(self.roundUp(event.y(), self.SQUARE_SIZE) / self.squareHeight())
 
-        click_loc = f'{chr(65 + col - 1)}{row}'
-
-        # clickLoc = "click loc: [" + str(event.x()) + "," + str(event.y()) + "] -> " + str(row) + ", " + str(col)
+        click_loc = f'{chr(65 + col - 1)}{row}'  # map to letter-number format
         self.clickLocationSignal.emit(click_loc)
-        self.nextPlayerColourSignal.emit(self.game_logic.next_player_colour)
+        self.nextPlayerColourSignal.emit(self.game_logic.nextPlayerColour)
 
         if (0 < row < 8) and (0 < col < 8):
-            if not self.game_logic.try_move(row - 1, col - 1):
-                print("try_move({}, {}) failed".format(row - 1, col - 1))
+            if not self.game_logic.tryMove(row - 1, col - 1):
+                print("tryMove({}, {}) failed".format(row - 1, col - 1))
         else:
             print("Out-of-band Calculated row: {}, col: {}", row, col)
+
+        self.pointsSignal.emit(self.game_logic.playerPoints)
         self.update()
-
-        self.points_signal.emit(self.game_logic.player_points)
-
-        # change the value depending on the player colour
 
     def resetGame(self):
         """ Clears pieces from the board """
-        # TODO write code to reset game
-        print("Reset signal received")
         self.init_board(self.board_width)
+        self.clickLocationSignal.emit("")
+        self.nextPlayerColourSignal.emit("Black")
+        self.pointsSignal.emit(self.game_logic.playerPoints)
+        self.updateTimerSignal.emit(self.counter)
         # We need to call update to trigger paintEvent
         self.update()
-        self.nextPlayerColourSignal.emit("BLACK")
-
-    def tryMove(self, newX, newY):
-        """ Tries to move a piece """
-        pass
 
     def drawSquares(self, painter):
         """ This method draws the board based on the given dimensions """
@@ -171,8 +150,6 @@ class Board(QFrame):
 
     def drawPieces(self, painter):
         """ This draws the game pieces on the board """
-        # FIXME - This variable wasn't used
-        colour = Qt.transparent  # empty square could be modeled with transparent pieces
         for row in range(0, len(self.board_array)):
             for col in range(0, len(self.board_array[0])):
                 colTransformation = (col + 1) * self.squareWidth()

@@ -52,15 +52,15 @@ class GameLogic:
         # Check if any stones have been captured
         captured = self.capture_stones(x, y)
 
-        # Check for suicidal try_move
+        # Check for suicidal tryMove
         if captured == 0:
             if self.is_suicidal(x, y):
                 # Set the coordinates back to free as we are not making a move
                 self.board_array[x][y] = self.FREE
                 return False
 
-        # Check for KO try_move
-        #if self.is_ko():
+        # Check for KO tryMove
+        #if self.isKo():
             # Set the coordinates back to free as we are not making a move
         #    self.board_array[x][y] = self.FREE
         #    return False
@@ -80,7 +80,7 @@ class GameLogic:
 
     def is_suicidal(self, x, y):
         """
-        Checks if try_move is suicidal
+        Checks if tryMove is suicidal
         """
         if self.num_liberties(x, y) == 0:
             self.read_data()
@@ -97,17 +97,17 @@ class GameLogic:
             print("self.game_data[-2][0]", self.game_data[-2][0])
             if self.board_array == self.game_data[-2][0]:
                 self.read_data()
-                print('Cannot make a try_move that is redundant!')
+                print('Cannot make a tryMove that is redundant!')
                 return True
         except IndexError as e:
-            print("IndexError in is_ko: {}".format(str(e)))
+            print("IndexError in isKo: {}".format(str(e)))
             return False
 
         return False
 
     def capture_stones(self, x, y):
         """
-        If any stones was taken by the last try_move at the given
+        If any stones was taken by the last tryMove at the given
         coordinates then removes it from the game and adds it up the points.
         """
         points = []
@@ -148,7 +148,7 @@ class GameLogic:
             self.load_game_state(self.game_data.pop())
             return current_state
         except IndexError as e:
-            print("IndexError in read_data: {}".format(str(e)))
+            print("IndexError in readData: {}".format(str(e)))
             return None
 
     def add_point(self, point):
@@ -165,7 +165,7 @@ class GameLogic:
         try:
             return self.board_array[x][y]
         except IndexError as e:
-            print("IndexError in xy_value: {}".format(str(e)))
+            print("IndexError in xyValue: {}".format(str(e)))
             return None
 
     def get_surrounding_coords(self, x, y):
@@ -245,7 +245,7 @@ class GameLogic:
         ]
 
         # print("surrounding_coords: ", surrounding_coords, ", visited: ", visited, ", colour: ", colour)
-        # print("l.self.get_surrounding_coords({}, {}): {}".format(x, y, self.get_surrounding_coords(x, y)))
+        # print("l.self.getSurroundingCoords({}, {}): {}".format(x, y, self.getSurroundingCoords(x, y)))
 
         # Mark current coordinates as having been visited to avoid double processing/loop
         visited.add((x, y))
