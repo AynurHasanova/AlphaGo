@@ -34,7 +34,7 @@ class GameLogic:
         # Stores the historical data of the current game
         self.game_data = []
 
-    def try_move(self, x, y):
+    def tryMove(self, x, y):
         """
         Move to the given coordinates for the current player. Returns true if successful
         """
@@ -46,15 +46,15 @@ class GameLogic:
             return False
 
         # Store state
-        self.save_data()
+        self.saveData()
         self.board_array[x][y] = self.current_player
 
         # Check if any stones have been captured
-        captured = self.capture_stones(x, y)
+        captured = self.captureStones(x, y)
 
         # Check for suicidal tryMove
         if captured == 0:
-            if self.is_suicidal(x, y):
+            if self.isSuicidal(x, y):
                 # Set the coordinates back to free as we are not making a move
                 self.board_array[x][y] = self.FREE
                 return False
@@ -66,37 +66,37 @@ class GameLogic:
         #    return False
 
         # Move on to the next player
-        self.change_player_turn(False)
+        self.changePlayerTurn(False)
         # Return true as we succeeded all the previous steps
         return True
 
-    def change_player_turn(self, passed):
+    def changePlayerTurn(self, passed):
         """
         Changes the turn to the next player.
         """
-        self.current_player = self.next_player
+        self.current_player = self.nextPlayer
         self.passed = passed
         return self.current_player
 
-    def is_suicidal(self, x, y):
+    def isSuicidal(self, x, y):
         """
         Checks if tryMove is suicidal
         """
-        if self.num_liberties(x, y) == 0:
-            self.read_data()
+        if self.numLiberties(x, y) == 0:
+            self.readData()
             print('Cannot play on a coordinate with no liberties!')
             return True
 
         return False
 
-    def is_ko(self):
+    def isKo(self):
         """
         Checks if the state is KO, which means it is redundant.
         """
         try:
             print("self.game_data[-2][0]", self.game_data[-2][0])
             if self.board_array == self.game_data[-2][0]:
-                self.read_data()
+                self.readData()
                 print('Cannot make a tryMove that is redundant!')
                 return True
         except IndexError as e:
@@ -105,21 +105,21 @@ class GameLogic:
 
         return False
 
-    def capture_stones(self, x, y):
+    def captureStones(self, x, y):
         """
         If any stones was taken by the last tryMove at the given
         coordinates then removes it from the game and adds it up the points.
         """
         points = []
-        for c, (x1, y1) in self.get_surrounding_coords(x, y):
-            if c is self.next_player and self.num_liberties(x1, y1) == 0:
-                point = self.capture_stone_group(x1, y1)
+        for c, (x1, y1) in self.getSurroundingCoords(x, y):
+            if c is self.nextPlayer and self.numLiberties(x1, y1) == 0:
+                point = self.captureStoneGroup(x1, y1)
                 print("Captured points: ", point)
                 points.append(point)
-                self.add_point(point)
+                self.addPoint(point)
         return sum(points)
 
-    def load_game_state(self, state):
+    def loadGameState(self, state):
         """
         Loads the specified game state
         """
@@ -133,32 +133,32 @@ class GameLogic:
         print("self.point: ", self.point, ", state[2]: ", state[2])
         self.point = state[2]
 
-    def save_data(self):
+    def saveData(self):
         """
         Saves game state.
         """
         self.game_data.append(self.state)
 
-    def read_data(self):
+    def readData(self):
         """
         Reads game data from saved state.
         """
         current_state = self.state
         try:
-            self.load_game_state(self.game_data.pop())
+            self.loadGameState(self.game_data.pop())
             return current_state
         except IndexError as e:
             print("IndexError in readData: {}".format(str(e)))
             return None
 
-    def add_point(self, point):
+    def addPoint(self, point):
         """
         Adds point to the current player's total points.
         """
         self.point[self.current_player] += point
         print("self.point: ", self.point)
 
-    def xy_value(self, x, y):
+    def xyValue(self, x, y):
         """
         Returns value of (x, y) of board_array if it exists, None otherwise.
         """
@@ -168,16 +168,16 @@ class GameLogic:
             print("IndexError in xyValue: {}".format(str(e)))
             return None
 
-    def get_surrounding_coords(self, x, y):
+    def getSurroundingCoords(self, x, y):
         """
         Returns a tuple of the clockwise surrounding coordinates of the given coordinate
         """
         # Four surrounding coordinates: north, south, west, east
         # it does not include a free coordinate.
         coordinates = ((x, y - 1), (x + 1, y), (x, y + 1), (x - 1, y))
-        return [(self.xy_value(x, y), (x, y)) for x, y in coordinates if self.xy_value(x, y) is not None]
+        return [(self.xyValue(x, y), (x, y)) for x, y in coordinates if self.xyValue(x, y) is not None]
 
-    def get_colour_group(self, x, y, visited):
+    def getColourGroup(self, x, y, visited):
         """
         Traverses adjacent coordinates of the same color and finds all
         group member coordinates.
@@ -185,7 +185,7 @@ class GameLogic:
         colour = self.board_array[x][y]
         # non-visited surrounding coordinates with the same color
         surrounding_coords = [
-            (c, (i, j)) for c, (i, j) in self.get_surrounding_coords(x, y)
+            (c, (i, j)) for c, (i, j) in self.getSurroundingCoords(x, y)
             if c is colour and (i, j) not in visited
         ]
 
@@ -194,12 +194,12 @@ class GameLogic:
 
         # coordinates with the same colour
         if surrounding_coords:
-            colour_group_coords = [self.get_colour_group(i, j, visited) for _, (i, j) in surrounding_coords]
+            colour_group_coords = [self.getColourGroup(i, j, visited) for _, (i, j) in surrounding_coords]
             return visited.union(*colour_group_coords)
 
         return visited
 
-    def get_stone_group(self, x, y):
+    def getStoneGroup(self, x, y):
         """
         Gets all coordinates for the members of the same
         group at the given coordinates.
@@ -208,9 +208,9 @@ class GameLogic:
             print('Error: Unknown game state')
             return
 
-        return self.get_colour_group(x, y, set())
+        return self.getColourGroup(x, y, set())
 
-    def capture_stone_group(self, x, y):
+    def captureStoneGroup(self, x, y):
         """
         Captures multiple stones, i.e. a group of black or white stones and returns the group size.
         """
@@ -218,7 +218,7 @@ class GameLogic:
             print('Cannot capture unknown player')
             return
 
-        stone_group = self.get_stone_group(x, y)
+        stone_group = self.getStoneGroup(x, y)
         point = len(stone_group)
 
         for x1, y1 in stone_group:
@@ -226,7 +226,7 @@ class GameLogic:
 
         return point
 
-    def get_liberties_set(self, x, y, visited):
+    def getLibertiesSet(self, x, y, visited):
         """
         Recursively traverses adjacent surrounding_coords of the same color to find all
         surrounding liberties for the group at the given coordinates.
@@ -240,7 +240,7 @@ class GameLogic:
         # with no visited coordinates
         surrounding_coords = [
             (c, (i, j))
-            for c, (i, j) in self.get_surrounding_coords(x, y)
+            for c, (i, j) in self.getSurroundingCoords(x, y)
             if (c is colour or c is self.FREE) and (i, j) not in visited
         ]
 
@@ -253,7 +253,7 @@ class GameLogic:
         # We need to collect unique coordinates of all surrounding liberties
         if surrounding_coords:
             liberties_coords = [
-                self.get_liberties_set(i, j, visited)
+                self.getLibertiesSet(i, j, visited)
                 for _, (i, j) in surrounding_coords
             ]
             return set.union(*liberties_coords)
@@ -261,23 +261,23 @@ class GameLogic:
         # if surrounding_coords was empty we reach here and return an empty set
         return set()
 
-    def get_liberties(self, x, y):
+    def getLiberties(self, x, y):
         """
         Collects the coordinates for liberties surrounding the group at the given
         coordinates.
         """
-        return self.get_liberties_set(x, y, set())
+        return self.getLibertiesSet(x, y, set())
 
-    def num_liberties(self, x, y):
+    def numLiberties(self, x, y):
         """
         Gets the number of liberties surrounding the group at the given
         coordinates.
         """
-        return len(self.get_liberties(x, y))
+        return len(self.getLiberties(x, y))
 
     # Class properties below
     @property
-    def next_player(self):
+    def nextPlayer(self):
         """
         Calculate the index/colour of the next player.
         """
@@ -288,26 +288,26 @@ class GameLogic:
         return self.PLAYERS[index]
 
     @property
-    def next_player_colour(self):
+    def nextPlayerColour(self):
         if self.is_started and (not self.passed):
             if self.current_player is self.BLACK:
-                return "WHITE"
+                return "White"
             elif self.current_player is self.WHITE:
-                return "BLACK"
+                return "Black"
             else:
-                return "NONE"
+                return "None"
         else:
             # Reset passed flag
             self.passed = False
             if self.current_player is self.BLACK:
-                return "BLACK"
+                return "Black"
             elif self.current_player is self.WHITE:
-                return "WHITE"
+                return "White"
             else:
-                return "NONE"
+                return "None"
 
     @property
-    def player_points(self):
+    def playerPoints(self):
         """
         Returns the player points as a json object.
         """

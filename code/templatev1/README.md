@@ -1,0 +1,1 @@
+template1 is deprecated, please use template2
