@@ -1,7 +1,7 @@
 from PyQt5 import QtWidgets, QtGui, QtCore
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QDialog, QTextEdit
+from PyQt5.QtWidgets import QDialog, QTextEdit, QMessageBox
 
 # Main widgets
 from widgets.board import Board
@@ -148,6 +148,9 @@ class GoApp(Ui_Main, QtWidgets.QMainWindow):
     def changeTurns(self):
         """gives turn to the other player"""
         print("passTurn: ", self.board.game_logic.passTurn())
+        if self.board.game_logic.passTurn():
+            self.showWinnerDialog("black")
+            return
         self.setNextPlayerColour(self.board.game_logic.currentPlayerColour)
 
     def pointsAndTerritories(self):
@@ -173,3 +176,24 @@ class GoApp(Ui_Main, QtWidgets.QMainWindow):
         """updates the label to show the next player name/colour"""
         print("Next Player: " + nextPlayer)
         self.next_player_label.setText("Next Player: " + nextPlayer)
+
+
+    def showWinnerDialog(self, player):
+        """shows a dialog box when a user loses the game"""
+        msg = QMessageBox()
+        msg.setIcon(QMessageBox.Warning)
+
+        msg.setText("Winner Detected")
+       # msg.setInformativeText(f"Player {player} lost the game!")
+        msg.setWindowTitle("Winner Detected")
+        msg.setInformativeText(f"Player {player} lost the game!")
+        msg.setDetailedText(f"Player {player} lost the game as this player passed his/her turn twice consecutively")
+        msg.setStandardButtons(QMessageBox.Ok)
+        msg.buttonClicked.connect(self.winnerConfirmation)
+
+        retval = msg.exec_()
+        print("Value of dialog box button:", retval)
+
+    def winnerConfirmation(self, i):
+        """resets the game after the OK button is pressed on the dialog box"""
+        self.resetGame()
