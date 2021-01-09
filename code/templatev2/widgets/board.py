@@ -48,13 +48,6 @@ class Board(QFrame):
 
         self.printBoardArray()
 
-        # TODO - Is this necessary, I thought scores in Go is computed after the game is over
-        # Player scores by core
-        # self._score = {
-        #     self.BLACK: 0,
-        #     self.WHITE: 0,
-        # }
-
         self.start()  # start the game which will start the timer
 
     def printBoardArray(self):
@@ -109,11 +102,13 @@ class Board(QFrame):
 
         click_loc = f'{chr(65 + col - 1)}{row}'  # map to letter-number format
         self.clickLocationSignal.emit(click_loc)
-        self.nextPlayerColourSignal.emit(self.game_logic.nextPlayerColour)
 
         if (0 < row < 8) and (0 < col < 8):
             if not self.game_logic.tryMove(row - 1, col - 1):
                 print("tryMove({}, {}) failed".format(row - 1, col - 1))
+            else:
+                # if tryMove succeeds then update the next player colour
+                self.nextPlayerColourSignal.emit(self.game_logic.nextPlayerColour)
         else:
             print("Out-of-band Calculated row: {}, col: {}", row, col)
 
@@ -167,12 +162,9 @@ class Board(QFrame):
                 painter.translate(colTransformation, rowTransformation)
                 painter.setBrush(colour)
 
-                # Todo draw some the pieces as elipses
+                # draw some the pieces as elipses
                 radius1 = (self.squareWidth() - 2) / 4
                 radius2 = (self.squareHeight() - 2) / 4
-                print("self.squareWidth(): {}, self.squareHeight(): {}, radius1: {}, radius2: {}".format(
-                    self.squareWidth(), self.squareHeight(), radius1, radius2))
                 center = QPoint(row, col)
-                print(center)
                 painter.drawEllipse(center, radius1, radius2)
                 painter.restore()

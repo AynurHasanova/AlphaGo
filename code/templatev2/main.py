@@ -145,7 +145,7 @@ class GoApp(Ui_Main, QtWidgets.QMainWindow):
 
     def changeTurns(self):
         """gives turn to the other player"""
-        self.board.game_logic.changePlayerTurn(True)
+        self.board.game_logic.changePlayerTurn()
         self.setNextPlayerColour(self.board.game_logic.nextPlayerColour)
 
     def points(self):

@@ -22,9 +22,6 @@ class GameLogic:
         # game is not currently started
         self.is_started = False
 
-        # whether the pass button clicked
-        self.passed = False
-
         # Points of each player
         self.point = {
             self.BLACK: 0,
@@ -57,6 +54,7 @@ class GameLogic:
             if self.isSuicidal(x, y):
                 # Set the coordinates back to free as we are not making a move
                 self.board_array[x][y] = self.FREE
+                print('It is a suicidal move!')
                 return False
 
         # Check for KO tryMove
@@ -66,16 +64,15 @@ class GameLogic:
         #    return False
 
         # Move on to the next player
-        self.changePlayerTurn(False)
+        self.changePlayerTurn()
         # Return true as we succeeded all the previous steps
         return True
 
-    def changePlayerTurn(self, passed):
+    def changePlayerTurn(self):
         """
         Changes the turn to the next player.
         """
         self.current_player = self.nextPlayer
-        self.passed = passed
         return self.current_player
 
     def isSuicidal(self, x, y):
@@ -289,22 +286,14 @@ class GameLogic:
 
     @property
     def nextPlayerColour(self):
-        if self.is_started and (not self.passed):
-            if self.current_player is self.BLACK:
-                return "White"
-            elif self.current_player is self.WHITE:
-                return "Black"
-            else:
-                return "None"
-        else:
-            # Reset passed flag
-            self.passed = False
-            if self.current_player is self.BLACK:
-                return "Black"
-            elif self.current_player is self.WHITE:
-                return "White"
-            else:
-                return "None"
+        colour = "None"
+        if self.current_player is self.BLACK:
+            colour = "Black"
+        elif self.current_player is self.WHITE:
+            colour = "White"
+
+        return colour
+
 
     @property
     def playerPoints(self):
