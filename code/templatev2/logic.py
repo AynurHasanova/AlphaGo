@@ -26,7 +26,15 @@ class GameLogic:
         self.is_started = False
 
         # pass_counts used to track if a player passes more than once in a row
+        # and the next player player his/her turn
         self.pass_counts = {
+            self.BLACK: 0,
+            self.WHITE: 0,
+        }
+
+        # pass_counts_without_move used to track if a player passes more than once in a row
+        # without any move from either player
+        self.pass_counts_without_move = {
             self.BLACK: 0,
             self.WHITE: 0,
         }
@@ -64,7 +72,6 @@ class GameLogic:
                 # Set the coordinates back to free as we are not making a move
                 self.board_array[x][y] = self.FREE
                 print('It is a suicidal move!')
-                print("isSuicidal: board_array[{}][{}]={}".format(x, y, self.board_array[x][y]))
                 return False
 
         # Check for KO tryMove
@@ -72,8 +79,13 @@ class GameLogic:
             # Set the coordinates back to free as we are not making a move
             self.board_array[x][y] = self.FREE
             print('It is a KO move!')
-            print("isKo: board_array[{}][{}]={}".format(x, y, self.board_array[x][y]))
             return False
+
+        # reset pass_counts_without_move
+        self.pass_counts_without_move = {
+            self.BLACK: 0,
+            self.WHITE: 0,
+        }
 
         # Move on to the next player
         self.changePlayerTurn()
@@ -101,14 +113,18 @@ class GameLogic:
     def passTurn(self):
         """pass current player's turn, returns True if the current player loose"""
         self.pass_counts[self.current_player] += 1
-        if self.pass_counts[self.current_player] == 2:
-            if self.current_player in self.previous_players:
-                print("Player: {} lost the game after two passes in a row".format(self.currentPlayerColour))
-                return True
-            self.pass_counts[self.current_player] = 0
+        self.pass_counts_without_move[self.current_player] += 1
+
+        print("passTurn: self.pass_counts: ", self.pass_counts,
+              ", self.pass_counts_without_move: ", self.pass_counts_without_move,
+              ", self.previous_players: ", self.previous_players,
+              ", self.current_player: ", self.current_player)
+
+        if self.pass_counts[self.current_player] == 2 or self.pass_counts_without_move[self.current_player] == 2:
+            print("Player: {} lost the game after two passes in a row".format(self.currentPlayerColour))
+            return True
 
         self.current_player = self.nextPlayer
-
         return False
 
     def isSuicidal(self, x, y):

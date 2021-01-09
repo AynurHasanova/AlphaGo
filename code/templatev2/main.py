@@ -147,10 +147,10 @@ class GoApp(Ui_Main, QtWidgets.QMainWindow):
 
     def changeTurns(self):
         """gives turn to the other player"""
-        print("passTurn: ", self.board.game_logic.passTurn())
         if self.board.game_logic.passTurn():
-            self.showWinnerDialog("black")
-            return
+            self.showWinnerDialog(self.board.game_logic.currentPlayerColour)
+        # this may cause to a confusion, but game_logic.currentPlayerColour is always the next player
+        # after the click on the board is finished
         self.setNextPlayerColour(self.board.game_logic.currentPlayerColour)
 
     def pointsAndTerritories(self):
