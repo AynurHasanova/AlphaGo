@@ -31,11 +31,12 @@ class GoApp(Ui_Main, QtWidgets.QMainWindow):
 
         self.current_time = 10
         self.player_timer_dial.display(self.current_time)
+        self.next_player_label.setText("Next Player: " + self.board.game_logic.currentPlayerColour)
 
         self.board.updateTimerSignal.connect(self.updateTimer)
-        self.board.clickLocationSignal.connect(self.incrementMoves)
+        self.board.clickLocationSignal.connect(self.setMoves)
         self.board.nextPlayerColourSignal.connect(self.setNextPlayerColour)
-        self.board.pointsSignal.connect(self.points)
+        self.board.pointsSignal.connect(self.pointsAndTerritories)
 
         self.pass_btn.clicked.connect(self.changeTurns)
         self.reset_btn.clicked.connect(self.resetGame)
@@ -52,11 +53,12 @@ class GoApp(Ui_Main, QtWidgets.QMainWindow):
         self.actionHelp.setIcon(QIcon('./assets/help.png'))
 
 
-    def incrementMoves(self, pos):
-        """increments the move count"""
+    def setMoves(self, pos):
+        """increments the total move count"""
         self.moveCount += 1
-        self.moves_count_label.setText(f"Moves: {self.moveCount}")
-        self.current_move_label.setText(pos)
+
+        self.moves_count_label.setText(f"Total Moves: {self.moveCount}")
+        self.current_move_label.setText("Coordinates: " + pos)
 
     def aboutCall(self):
         """about menu item"""
@@ -145,12 +147,22 @@ class GoApp(Ui_Main, QtWidgets.QMainWindow):
 
     def changeTurns(self):
         """gives turn to the other player"""
-        self.board.game_logic.changePlayerTurn()
-        self.setNextPlayerColour(self.board.game_logic.nextPlayerColour)
+        print("passTurn: ", self.board.game_logic.passTurn())
+        self.setNextPlayerColour(self.board.game_logic.currentPlayerColour)
 
-    def points(self):
-        """calculates player points"""
-        self.points_label.setText(self.board.game_logic.playerPoints)
+    def pointsAndTerritories(self):
+        """calculates player points and territories"""
+        self.black_points.setText("Black Points: " + str(self.board.game_logic.playerPoints[0]))
+        self.white_points.setText("White Points: " + str(self.board.game_logic.playerPoints[1]))
+
+        black_territories = 0
+        white_territories = 0
+        for row in self.board.game_logic.board_array:
+            black_territories += row.count(self.board.BLACK)
+            white_territories += row.count(self.board.WHITE)
+
+        self.black_points.setText("Black Territories: " + str(black_territories))
+        self.white_points.setText("White Territories: " + str(white_territories))
 
     def resetGame(self):
         """resets the game board by clearing all states"""
@@ -160,4 +172,4 @@ class GoApp(Ui_Main, QtWidgets.QMainWindow):
     def setNextPlayerColour(self, nextPlayer):
         """updates the label to show the next player name/colour"""
         print("Next Player: " + nextPlayer)
-        self.current_player_label.setText(nextPlayer)
+        self.next_player_label.setText("Next Player: " + nextPlayer)

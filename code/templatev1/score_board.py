@@ -55,7 +55,7 @@ class ScoreBoard(QDockWidget):
         board.click_location_signal.connect(self.set_click_location)
         # when the click_location_signal is emitted in board the set_click_location slot receives it
         board.next_player_colour_signal.connect(self.set_next_player_colour)
-        # get points from board.py
+        # get pointsAndTerritories from board.py
         board.pointsSignal.connect(self.set_player_points)
         # when the update_timer_signal is emitted in the board the set_time_remaining slot receives it
         board.update_timer_signal.connect(self.set_time_remaining)

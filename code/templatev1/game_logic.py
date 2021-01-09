@@ -108,13 +108,13 @@ class GameLogic:
     def capture_stones(self, x, y):
         """
         If any stones was taken by the last tryMove at the given
-        coordinates then removes it from the game and adds it up the points.
+        coordinates then removes it from the game and adds it up the pointsAndTerritories.
         """
         points = []
         for c, (x1, y1) in self.get_surrounding_coords(x, y):
             if c is self.next_player and self.num_liberties(x1, y1) == 0:
                 point = self.capture_stone_group(x1, y1)
-                print("Captured points: ", point)
+                print("Captured pointsAndTerritories: ", point)
                 points.append(point)
                 self.add_point(point)
         return sum(points)
@@ -153,7 +153,7 @@ class GameLogic:
 
     def add_point(self, point):
         """
-        Adds point to the current player's total points.
+        Adds point to the current player's total pointsAndTerritories.
         """
         self.point[self.current_player] += point
         print("self.point: ", self.point)
@@ -309,13 +309,13 @@ class GameLogic:
     @property
     def player_points(self):
         """
-        Returns the player points as a json object.
+        Returns the player pointsAndTerritories as a json object.
         """
         return "(B:{}, W:{})".format(self.point[self.BLACK], self.point[self.WHITE])
 
     @property
     def state(self):
         """
-        Returns the game state (board, current player, and points) as a tuple.
+        Returns the game state (board, current player, and pointsAndTerritories) as a tuple.
         """
         return self.board_array[:], self.current_player, copy(self.point)

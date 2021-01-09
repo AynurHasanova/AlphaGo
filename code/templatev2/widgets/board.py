@@ -24,7 +24,7 @@ class Board(QFrame):
     )
 
     # All the App's signals
-    pointsSignal = pyqtSignal(str)  # used to send points to the score_board
+    pointsSignal = pyqtSignal(tuple)  # used to send pointsAndTerritories to the score_board
     updateTimerSignal = pyqtSignal(int)  # signal sent when timer is updated
     clickLocationSignal = pyqtSignal(str)  # signal sent when there is a new click location
     nextPlayerColourSignal = pyqtSignal(str)  # signal sent with the next player name
@@ -100,17 +100,17 @@ class Board(QFrame):
         row = int(self.roundUp(event.y(), self.SQUARE_SIZE) / self.squareHeight())
 
         click_loc = f'{chr(65 + col - 1)}{row}'  # map to letter-number format
-        self.clickLocationSignal.emit(click_loc)
 
         if (0 < row < 8) and (0 < col < 8):
             if not self.game_logic.tryMove(row - 1, col - 1):
                 print("tryMove({}, {}) failed".format(row - 1, col - 1))
             else:
                 # if tryMove succeeds then update the next player colour
-                self.nextPlayerColourSignal.emit(self.game_logic.nextPlayerColour)
+                self.nextPlayerColourSignal.emit(self.game_logic.currentPlayerColour)
         else:
             print("Out-of-band Calculated row: {}, col: {}", row, col)
 
+        self.clickLocationSignal.emit(click_loc)
         self.pointsSignal.emit(self.game_logic.playerPoints)
         self.update()
 

@@ -7,7 +7,7 @@ from game_logic import GameLogic
 class Board(QFrame):  # base the board on a QFrame widget
     SQUARE_SIZE = 50
 
-    points_signal = pyqtSignal(str)  # used to send points to the score_board
+    points_signal = pyqtSignal(str)  # used to send pointsAndTerritories to the score_board
     update_timer_signal = pyqtSignal(int) # signal sent when timer is updated
     click_location_signal = pyqtSignal(str) # signal sent when there is a new click location
     next_player_colour_signal = pyqtSignal(str)  # signal sent with the next player name
@@ -98,7 +98,7 @@ class Board(QFrame):  # base the board on a QFrame widget
 
         click_loc = "["+str(row) + ", " + str(col) + "]"
         self.click_location_signal.emit(click_loc)
-        self.next_player_colour_signal.emit(self.game_logic.nextPlayerColour)
+        self.next_player_colour_signal.emit(self.game_logic.currentPlayerColour)
 
         if (0 < row < 8) and (0 < col < 8):
             if not self.game_logic.tryMove(row - 1, col - 1):
@@ -155,4 +155,4 @@ class Board(QFrame):  # base the board on a QFrame widget
         else:
             print("Pass signal received")
             self.game_logic.changePlayerTurn(True)
-            self.next_player_colour_signal.emit(self.game_logic.nextPlayerColour)
+            self.next_player_colour_signal.emit(self.game_logic.currentPlayerColour)

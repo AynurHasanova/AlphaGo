@@ -19,8 +19,17 @@ class GameLogic:
         # The blacks starts first by the rules
         self.current_player = self.BLACK
 
+        # self.previous_players is used to check if a player passes more than once in a row
+        self.previous_players = 4 * [self.FREE]
+
         # game is not currently started
         self.is_started = False
+
+        # pass_counts used to track if a player passes more than once in a row
+        self.pass_counts = {
+            self.BLACK: 0,
+            self.WHITE: 0,
+        }
 
         # Points of each player
         self.point = {
@@ -73,10 +82,34 @@ class GameLogic:
 
     def changePlayerTurn(self):
         """
-        Changes the turn to the next player.
+        Changes the turn to the next player
         """
+        print("self.pass_counts: ", self.pass_counts,
+              ", self.previous_players: ", self.previous_players,
+              ", self.current_player: ", self.current_player)
+        if self.current_player not in self.previous_players:
+            print("Reset pass counts")
+            self.pass_counts[self.current_player] = 0
+
+        self.previous_players[0] = self.previous_players[1]
+        self.previous_players[1] = self.previous_players[2]
+        self.previous_players[2] = self.previous_players[3]
+        self.previous_players[3] = self.current_player
+
         self.current_player = self.nextPlayer
-        return self.current_player
+
+    def passTurn(self):
+        """pass current player's turn, returns True if the current player loose"""
+        self.pass_counts[self.current_player] += 1
+        if self.pass_counts[self.current_player] == 2:
+            if self.current_player in self.previous_players:
+                print("Player: {} lost the game after two passes in a row".format(self.currentPlayerColour))
+                return True
+            self.pass_counts[self.current_player] = 0
+
+        self.current_player = self.nextPlayer
+
+        return False
 
     def isSuicidal(self, x, y):
         """
@@ -108,13 +141,13 @@ class GameLogic:
     def captureStones(self, x, y):
         """
         If any stones was taken by the last tryMove at the given
-        coordinates then removes it from the game and adds it up the points.
+        coordinates then removes it from the game and adds it up the pointsAndTerritories.
         """
         points = []
         for c, (x1, y1) in self.getSurroundingCoords(x, y):
             if c is self.nextPlayer and self.numLiberties(x1, y1) == 0:
                 point = self.captureStoneGroup(x1, y1)
-                print("Captured points: ", point)
+                print("Captured pointsAndTerritories: ", point)
                 points.append(point)
                 self.addPoint(point)
         return sum(points)
@@ -153,7 +186,7 @@ class GameLogic:
 
     def addPoint(self, point):
         """
-        Adds point to the current player's total points.
+        Adds point to the current player's total pointsAndTerritories.
         """
         self.point[self.current_player] += point
         print("self.point: ", self.point)
@@ -288,7 +321,8 @@ class GameLogic:
         return self.PLAYERS[index]
 
     @property
-    def nextPlayerColour(self):
+    def currentPlayerColour(self):
+        """it returns the current player colour"""
         colour = "None"
         if self.current_player is self.BLACK:
             colour = "Black"
@@ -301,13 +335,13 @@ class GameLogic:
     @property
     def playerPoints(self):
         """
-        Returns the player points as a json object.
+        Returns the player pointsAndTerritories as a json object.
         """
-        return "(B:{}, W:{})".format(self.point[self.BLACK], self.point[self.WHITE])
+        return self.point[self.BLACK], self.point[self.WHITE]
 
     @property
     def state(self):
         """
-        Returns the game state (board, current player, and points) as a tuple.
+        Returns the game state (board, current player, and pointsAndTerritories) as a tuple.
         """
         return deepcopy(self.board_array[:]), self.current_player, copy(self.point)
