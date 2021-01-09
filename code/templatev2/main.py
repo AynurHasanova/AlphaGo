@@ -60,8 +60,7 @@ class GoApp(Ui_Main, QtWidgets.QMainWindow):
 
     def aboutCall(self):
         """about menu item"""
-        _translate = QtCore.QCoreApplication.translate
-        aboutText = _translate("Main", "<html><head/><body><p align=\"center\"><span style=\" font-size:12pt;\">AlphaGo</span><span style=\" font-size:12pt; vertical-align:sub;\">lite</span>v1.0.0</p></body></html>")
+        aboutText = "<html><head/><body><p align=\"center\"><span style=\" font-size:12pt;\">AlphaGo</span><span style=\" font-size:12pt; vertical-align:sub;\">lite</span>v1.0.0</p></body></html>"
 
         print('About')
         help_window = QDialog(self)
@@ -86,8 +85,7 @@ class GoApp(Ui_Main, QtWidgets.QMainWindow):
 
     def helpCall(self):
         """helm menu item"""
-        _translate = QtCore.QCoreApplication.translate
-        helpText = _translate("Main", """
+        helpText = """
                         <html>
                             <head>
                             </head>
@@ -119,7 +117,7 @@ class GoApp(Ui_Main, QtWidgets.QMainWindow):
                             <ul>
                             </body>
                             </html>
-                        """)
+                        """
 
         print('Help')
 
