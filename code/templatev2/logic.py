@@ -1,4 +1,4 @@
-from copy import copy
+from copy import copy, deepcopy
 
 
 class GameLogic:
@@ -13,8 +13,8 @@ class GameLogic:
         WHITE,
     )
 
-    def __init__(self, board_array):
-        self.board_array = board_array
+    def __init__(self, board_width):
+        self.board_array = [[0 for _ in range(board_width)] for _ in range(board_width)]
 
         # The blacks starts first by the rules
         self.current_player = self.BLACK
@@ -55,13 +55,16 @@ class GameLogic:
                 # Set the coordinates back to free as we are not making a move
                 self.board_array[x][y] = self.FREE
                 print('It is a suicidal move!')
+                print("isSuicidal: board_array[{}][{}]={}".format(x, y, self.board_array[x][y]))
                 return False
 
         # Check for KO tryMove
-        #if self.isKo():
+        if self.isKo():
             # Set the coordinates back to free as we are not making a move
-        #    self.board_array[x][y] = self.FREE
-        #    return False
+            self.board_array[x][y] = self.FREE
+            print('It is a KO move!')
+            print("isKo: board_array[{}][{}]={}".format(x, y, self.board_array[x][y]))
+            return False
 
         # Move on to the next player
         self.changePlayerTurn()
@@ -307,4 +310,4 @@ class GameLogic:
         """
         Returns the game state (board, current player, and points) as a tuple.
         """
-        return self.board_array[:], self.current_player, copy(self.point)
+        return deepcopy(self.board_array[:]), self.current_player, copy(self.point)

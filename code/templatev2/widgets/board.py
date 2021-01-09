@@ -43,8 +43,7 @@ class Board(QFrame):
         self.isStarted = False
 
         self.board_width = self.board_height = board_width
-        self.board_array = [[0 for _ in range(board_width)] for _ in range(board_width)]
-        self.game_logic = GameLogic(self.board_array)
+        self.game_logic = GameLogic(self.board_width)
 
         self.printBoardArray()
 
@@ -53,7 +52,7 @@ class Board(QFrame):
     def printBoardArray(self):
         """ prints the board_array in an attractive way """
         print("board_array:")
-        print('\n'.join(['\t'.join([str(cell) for cell in row]) for row in self.board_array]))
+        print('\n'.join(['\t'.join([str(cell) for cell in row]) for row in self.game_logic.board_array]))
 
     def squareWidth(self):
         """ returns the width of one square in the board """
@@ -145,15 +144,15 @@ class Board(QFrame):
 
     def drawPieces(self, painter):
         """ This draws the game pieces on the board """
-        for row in range(0, len(self.board_array)):
-            for col in range(0, len(self.board_array[0])):
+        for row in range(0, len(self.game_logic.board_array)):
+            for col in range(0, len(self.game_logic.board_array[0])):
                 colTransformation = (col + 1) * self.squareWidth()
                 rowTransformation = (row + 1) * self.squareHeight()
 
                 # Todo choose your colour and set the painter brush to the correct colour
-                if self.board_array[row][col] == 1:
+                if self.game_logic.board_array[row][col] == 1:
                     colour = Qt.black
-                elif self.board_array[row][col] == 2:
+                elif self.game_logic.board_array[row][col] == 2:
                     colour = Qt.white
                 else:
                     continue
