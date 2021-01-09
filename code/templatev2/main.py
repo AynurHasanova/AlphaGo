@@ -40,6 +40,10 @@ class GoApp(Ui_Main, QtWidgets.QMainWindow):
         self.pass_btn.clicked.connect(self.changeTurns)
         self.reset_btn.clicked.connect(self.resetGame)
 
+        self.actionAbout.triggered.connect(self.aboutCall)
+        self.actionAbout.setShortcut('Ctrl+A')
+        self.actionAbout.setIcon(QIcon('./assets/help.png'))
+
         self.actionExit.triggered.connect(self.exitCall)
         self.actionExit.setShortcut('Ctrl+Q')
         self.actionExit.setIcon(QIcon('./assets/exit.png'))
@@ -54,6 +58,23 @@ class GoApp(Ui_Main, QtWidgets.QMainWindow):
         self.moves_count_label.setText(f"Moves: {self.moveCount}")
         self.current_move_label.setText(pos)
 
+    def aboutCall(self):
+        """about menu item"""
+        _translate = QtCore.QCoreApplication.translate
+        aboutText = _translate("Main", "<html><head/><body><p align=\"center\"><span style=\" font-size:12pt;\">AlphaGo</span><span style=\" font-size:12pt; vertical-align:sub;\">lite</span>v1.0.0</p></body></html>")
+
+        print('About')
+        help_window = QDialog(self)
+        tb = QTextEdit(help_window)
+        tb.resize(150, 150)
+        tb.setReadOnly(True)
+        tb.setText(aboutText)
+        tb.setAlignment(Qt.AlignLeft)
+        help_window.setWindowTitle("About")
+        help_window.setFixedHeight(50)
+        help_window.setFixedWidth(150)
+        help_window.show()
+
     def exitCall(self):
         """exit menu item with confirmation"""
         print('Exiting game')
@@ -65,24 +86,52 @@ class GoApp(Ui_Main, QtWidgets.QMainWindow):
 
     def helpCall(self):
         """helm menu item"""
-        user_guide = """Go("encircling game") is an abstract strategy board game for two players, in which the aim is to surround more territory than the opponent.The game was invented in China over 3, 000 years ago and is therefore believed to be the oldest board game continuously played today.It was considered one of the four essential arts of the cultured aristocratic Chinese scholars in antiquity.Despite its relatively simple rules, Go is very complex, even more so than chess.Computers have only recently been capable of beating human masters.Have a look at the following for more details: https: // deepmind.com / research / alphago / Movement: Black
-        plays first, with black and white taking turns.A stone can be placed at any unoccupied intersection of the board with limited exceptions.
-
-        Suicide Rule: You cannot place a stone which will immediately have no liberties.
-
-        KO Rule(EternityRule): Previous game states are not allowed. Keep a list of previous game states which must be checked before stones are placed https://youtu.be/JWdgqV-8yVg?t=7
-        m35s. """
+        _translate = QtCore.QCoreApplication.translate
+        helpText = _translate("Main", """
+                        <html>
+                            <head>
+                            </head>
+                            <body>
+                            <h1>Go</h1>
+                            <p>Overview</p>
+                            <p>Go("encircling game") is an abstract strategy board game for two players, in which the aim is to surround more territory than the opponent. The game was invented in China over 3,000 years ago and is therefore believed to be the oldest board game continuously played today. It was considered one of the four essential arts of the cultured aristocratic Chinese scholars in antiquity. Despite its relatively simple rules, Go is very complex, even more so than chess. Computers have only recently been capable of beating human masters. 
+                            Have a look at the following for more details: https://deepmind.com/research/alphago
+                            <p>Movement</p>
+                            <ul>
+                            <li>
+                            Two players: black and white taking turns
+                            </li>
+                            <li>
+                            Black plays first. with black and white taking turns.A stone can be placed at any unoccupied intersection of the board with limited exceptions.
+                            </li>
+                            <li>
+                            A stone can be placed at any unoccupied intersection of the board with limited exceptions.
+                            </li>
+                            </ul>
+                            <p>Rules</p> 
+                            <ul>
+                            <li>
+                            Suicide Rule: You cannot place a stone which will immediately have no liberties.
+                            </li>
+                            <li>
+                            KO Rule(EternityRule): Previous game states are not allowed. Keep a list of previous game states which must be checked before stones are placed https://youtu.be/JWdgqV-8yVg?t=7m35s.
+                            </li>
+                            <ul>
+                            </body>
+                            </html>
+                        """)
 
         print('Help')
+
         help_window = QDialog(self)
         tb = QTextEdit(help_window)
-        tb.resize(350, 250)
+        tb.resize(400, 260)
         tb.setReadOnly(True)
-        tb.setText(user_guide)
+        tb.setText(helpText)
         tb.setAlignment(Qt.AlignLeft)
         help_window.setWindowTitle("Help")
         help_window.setFixedHeight(260)
-        help_window.setFixedWidth(360)
+        help_window.setFixedWidth(400)
         help_window.show()
 
     def center(self):
