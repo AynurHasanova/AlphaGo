@@ -128,9 +128,7 @@ class GameLogic:
         return False
 
     def isSuicidal(self, x, y):
-        """
-        Checks if tryMove is suicidal
-        """
+        """Checks if tryMove is suicidal"""
         if self.numLiberties(x, y) == 0:
             self.readData()
             print('Cannot play on a coordinate with no liberties!')
@@ -139,11 +137,8 @@ class GameLogic:
         return False
 
     def isKo(self):
-        """
-        Checks if the state is KO, which means it is redundant.
-        """
+        """Checks if the state is KO, which means it is redundant"""
         try:
-            print("self.game_data[-2][0]", self.game_data[-2][0])
             if self.board_array == self.game_data[-2][0]:
                 self.readData()
                 print('Cannot make a tryMove that is redundant!')
