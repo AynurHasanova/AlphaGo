@@ -1,9 +1,8 @@
 from PyQt5.QtWidgets import QFrame
-from PyQt5.QtCore import Qt, QBasicTimer, pyqtSignal, QPoint, pyqtSlot
+from PyQt5.QtCore import Qt, QBasicTimer, pyqtSignal, QPoint
 from PyQt5.QtGui import QPainter
 
 from logic import GameLogic
-from utils import Player
 
 
 class Board(QFrame):
@@ -16,7 +15,7 @@ class Board(QFrame):
 
     # TODO set the board width and height to be square
     timerSpeed = 1000  # the timer updates every 1 second
-    counter = 10  # the number the counter will count down from
+    counter = 100  # the number the counter will count down from
 
     TURNS = (
         BLACK,
@@ -66,7 +65,6 @@ class Board(QFrame):
         """ Starts game """
         # set the boolean which determines if the game has started to TRUE
         self.isStarted = True
-        #self.resetGame()
 
         # start the timer with the correct speed
         self.timer.start(self.timerSpeed, self)

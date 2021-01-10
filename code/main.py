@@ -1,4 +1,4 @@
-from PyQt5 import QtWidgets, QtGui, QtCore
+from PyQt5 import QtWidgets
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QDialog, QTextEdit, QMessageBox
@@ -21,7 +21,6 @@ class GoApp(Ui_Main, QtWidgets.QMainWindow):
         super(GoApp, self).__init__(*args, **kwargs)
         self.setupUi(self)
         self.menubar.setNativeMenuBar(False)
-        # self.center()
 
         self.moveCount = 0
 
@@ -29,7 +28,7 @@ class GoApp(Ui_Main, QtWidgets.QMainWindow):
         self.board = Board(self, self.board_width)
         self.mainBoard_layout.addWidget(self.board)
 
-        self.current_time = 10
+        self.current_time = 100
         self.player_timer_dial.display(self.current_time)
         self.next_player_label.setText("Next Player: " + self.board.game_logic.currentPlayerColour)
 
@@ -43,7 +42,7 @@ class GoApp(Ui_Main, QtWidgets.QMainWindow):
 
         self.actionAbout.triggered.connect(self.aboutCall)
         self.actionAbout.setShortcut('Ctrl+A')
-        self.actionAbout.setIcon(QIcon('./assets/help.png'))
+        self.actionAbout.setIcon(QIcon('./assets/about.png'))
 
         self.actionExit.triggered.connect(self.exitCall)
         self.actionExit.setShortcut('Ctrl+Q')
@@ -164,8 +163,8 @@ class GoApp(Ui_Main, QtWidgets.QMainWindow):
             black_territories += row.count(self.board.BLACK)
             white_territories += row.count(self.board.WHITE)
 
-        self.black_points.setText("Black Territories: " + str(black_territories))
-        self.white_points.setText("White Territories: " + str(white_territories))
+        self.black_territories.setText("Black Territories: " + str(black_territories))
+        self.white_territories.setText("White Territories: " + str(white_territories))
 
     def resetGame(self):
         """resets the game board by clearing all states"""
