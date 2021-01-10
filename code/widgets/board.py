@@ -1,9 +1,8 @@
 from PyQt5.QtWidgets import QFrame
-from PyQt5.QtCore import Qt, QBasicTimer, pyqtSignal, QPoint, pyqtSlot
+from PyQt5.QtCore import Qt, QBasicTimer, pyqtSignal, QPoint
 from PyQt5.QtGui import QPainter
 
 from logic import GameLogic
-from utils import Player
 
 
 class Board(QFrame):
@@ -16,7 +15,7 @@ class Board(QFrame):
 
     # TODO set the board width and height to be square
     timerSpeed = 1000  # the timer updates every 1 second
-    counter = 10  # the number the counter will count down from
+    counter = 100  # the number the counter will count down from
 
     TURNS = (
         BLACK,
@@ -24,7 +23,7 @@ class Board(QFrame):
     )
 
     # All the App's signals
-    pointsSignal = pyqtSignal(str)  # used to send points to the score_board
+    pointsSignal = pyqtSignal(tuple)  # used to send pointsAndTerritories to the score_board
     updateTimerSignal = pyqtSignal(int)  # signal sent when timer is updated
     clickLocationSignal = pyqtSignal(str)  # signal sent when there is a new click location
     nextPlayerColourSignal = pyqtSignal(str)  # signal sent with the next player name
@@ -43,24 +42,16 @@ class Board(QFrame):
         self.isStarted = False
 
         self.board_width = self.board_height = board_width
-        self.board_array = [[0 for _ in range(board_width)] for _ in range(board_width)]
-        self.game_logic = GameLogic(self.board_array)
+        self.game_logic = GameLogic(self.board_width)
 
         self.printBoardArray()
-
-        # TODO - Is this necessary, I thought scores in Go is computed after the game is over
-        # Player scores by core
-        # self._score = {
-        #     self.BLACK: 0,
-        #     self.WHITE: 0,
-        # }
 
         self.start()  # start the game which will start the timer
 
     def printBoardArray(self):
         """ prints the board_array in an attractive way """
         print("board_array:")
-        print('\n'.join(['\t'.join([str(cell) for cell in row]) for row in self.board_array]))
+        print('\n'.join(['\t'.join([str(cell) for cell in row]) for row in self.game_logic.board_array]))
 
     def squareWidth(self):
         """ returns the width of one square in the board """
@@ -74,7 +65,6 @@ class Board(QFrame):
         """ Starts game """
         # set the boolean which determines if the game has started to TRUE
         self.isStarted = True
-        #self.resetGame()
 
         # start the timer with the correct speed
         self.timer.start(self.timerSpeed, self)
@@ -108,15 +98,17 @@ class Board(QFrame):
         row = int(self.roundUp(event.y(), self.SQUARE_SIZE) / self.squareHeight())
 
         click_loc = f'{chr(65 + col - 1)}{row}'  # map to letter-number format
-        self.clickLocationSignal.emit(click_loc)
-        self.nextPlayerColourSignal.emit(self.game_logic.nextPlayerColour)
 
         if (0 < row < 8) and (0 < col < 8):
             if not self.game_logic.tryMove(row - 1, col - 1):
                 print("tryMove({}, {}) failed".format(row - 1, col - 1))
+            else:
+                # if tryMove succeeds then update the next player colour
+                self.nextPlayerColourSignal.emit(self.game_logic.currentPlayerColour)
         else:
             print("Out-of-band Calculated row: {}, col: {}", row, col)
 
+        self.clickLocationSignal.emit(click_loc)
         self.pointsSignal.emit(self.game_logic.playerPoints)
         self.update()
 
@@ -150,15 +142,15 @@ class Board(QFrame):
 
     def drawPieces(self, painter):
         """ This draws the game pieces on the board """
-        for row in range(0, len(self.board_array)):
-            for col in range(0, len(self.board_array[0])):
+        for row in range(0, len(self.game_logic.board_array)):
+            for col in range(0, len(self.game_logic.board_array[0])):
                 colTransformation = (col + 1) * self.squareWidth()
                 rowTransformation = (row + 1) * self.squareHeight()
 
                 # Todo choose your colour and set the painter brush to the correct colour
-                if self.board_array[row][col] == 1:
+                if self.game_logic.board_array[row][col] == 1:
                     colour = Qt.black
-                elif self.board_array[row][col] == 2:
+                elif self.game_logic.board_array[row][col] == 2:
                     colour = Qt.white
                 else:
                     continue
@@ -167,12 +159,9 @@ class Board(QFrame):
                 painter.translate(colTransformation, rowTransformation)
                 painter.setBrush(colour)
 
-                # Todo draw some the pieces as elipses
+                # draw some the pieces as elipses
                 radius1 = (self.squareWidth() - 2) / 4
                 radius2 = (self.squareHeight() - 2) / 4
-                print("self.squareWidth(): {}, self.squareHeight(): {}, radius1: {}, radius2: {}".format(
-                    self.squareWidth(), self.squareHeight(), radius1, radius2))
                 center = QPoint(row, col)
-                print(center)
                 painter.drawEllipse(center, radius1, radius2)
                 painter.restore()

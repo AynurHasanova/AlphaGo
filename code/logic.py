@@ -1,4 +1,4 @@
-from copy import copy
+from copy import copy, deepcopy
 
 
 class GameLogic:
@@ -13,17 +13,31 @@ class GameLogic:
         WHITE,
     )
 
-    def __init__(self, board_array):
-        self.board_array = board_array
+    def __init__(self, board_width):
+        self.board_array = [[0 for _ in range(board_width)] for _ in range(board_width)]
 
         # The blacks starts first by the rules
         self.current_player = self.BLACK
 
+        # self.previous_players is used to check if a player passes more than once in a row
+        self.previous_players = 4 * [self.FREE]
+
         # game is not currently started
         self.is_started = False
 
-        # whether the pass button clicked
-        self.passed = False
+        # pass_counts used to track if a player passes more than once in a row
+        # and the next player player his/her turn
+        self.pass_counts = {
+            self.BLACK: 0,
+            self.WHITE: 0,
+        }
+
+        # pass_counts_without_move used to track if a player passes more than once in a row
+        # without any move from either player
+        self.pass_counts_without_move = {
+            self.BLACK: 0,
+            self.WHITE: 0,
+        }
 
         # Points of each player
         self.point = {
@@ -57,31 +71,64 @@ class GameLogic:
             if self.isSuicidal(x, y):
                 # Set the coordinates back to free as we are not making a move
                 self.board_array[x][y] = self.FREE
+                print('It is a suicidal move!')
                 return False
 
         # Check for KO tryMove
-        #if self.isKo():
+        if self.isKo():
             # Set the coordinates back to free as we are not making a move
-        #    self.board_array[x][y] = self.FREE
-        #    return False
+            self.board_array[x][y] = self.FREE
+            print('It is a KO move!')
+            return False
+
+        # reset pass_counts_without_move
+        self.pass_counts_without_move = {
+            self.BLACK: 0,
+            self.WHITE: 0,
+        }
 
         # Move on to the next player
-        self.changePlayerTurn(False)
+        self.changePlayerTurn()
         # Return true as we succeeded all the previous steps
         return True
 
-    def changePlayerTurn(self, passed):
+    def changePlayerTurn(self):
         """
-        Changes the turn to the next player.
+        Changes the turn to the next player
         """
+        print("self.pass_counts: ", self.pass_counts,
+              ", self.previous_players: ", self.previous_players,
+              ", self.current_player: ", self.current_player)
+        if self.current_player not in self.previous_players:
+            print("Reset pass counts")
+            self.pass_counts[self.current_player] = 0
+
+        self.previous_players[0] = self.previous_players[1]
+        self.previous_players[1] = self.previous_players[2]
+        self.previous_players[2] = self.previous_players[3]
+        self.previous_players[3] = self.current_player
+
         self.current_player = self.nextPlayer
-        self.passed = passed
-        return self.current_player
+
+    def passTurn(self):
+        """pass current player's turn, returns True if the current player loose"""
+        self.pass_counts[self.current_player] += 1
+        self.pass_counts_without_move[self.current_player] += 1
+
+        print("passTurn: self.pass_counts: ", self.pass_counts,
+              ", self.pass_counts_without_move: ", self.pass_counts_without_move,
+              ", self.previous_players: ", self.previous_players,
+              ", self.current_player: ", self.current_player)
+
+        if self.pass_counts[self.current_player] == 2 or self.pass_counts_without_move[self.current_player] == 2:
+            print("Player: {} lost the game after two passes in a row".format(self.currentPlayerColour))
+            return True
+
+        self.current_player = self.nextPlayer
+        return False
 
     def isSuicidal(self, x, y):
-        """
-        Checks if tryMove is suicidal
-        """
+        """Checks if tryMove is suicidal"""
         if self.numLiberties(x, y) == 0:
             self.readData()
             print('Cannot play on a coordinate with no liberties!')
@@ -90,11 +137,8 @@ class GameLogic:
         return False
 
     def isKo(self):
-        """
-        Checks if the state is KO, which means it is redundant.
-        """
+        """Checks if the state is KO, which means it is redundant"""
         try:
-            print("self.game_data[-2][0]", self.game_data[-2][0])
             if self.board_array == self.game_data[-2][0]:
                 self.readData()
                 print('Cannot make a tryMove that is redundant!')
@@ -108,13 +152,13 @@ class GameLogic:
     def captureStones(self, x, y):
         """
         If any stones was taken by the last tryMove at the given
-        coordinates then removes it from the game and adds it up the points.
+        coordinates then removes it from the game and adds it up the pointsAndTerritories.
         """
         points = []
         for c, (x1, y1) in self.getSurroundingCoords(x, y):
             if c is self.nextPlayer and self.numLiberties(x1, y1) == 0:
                 point = self.captureStoneGroup(x1, y1)
-                print("Captured points: ", point)
+                print("Captured pointsAndTerritories: ", point)
                 points.append(point)
                 self.addPoint(point)
         return sum(points)
@@ -153,7 +197,7 @@ class GameLogic:
 
     def addPoint(self, point):
         """
-        Adds point to the current player's total points.
+        Adds point to the current player's total pointsAndTerritories.
         """
         self.point[self.current_player] += point
         print("self.point: ", self.point)
@@ -288,34 +332,27 @@ class GameLogic:
         return self.PLAYERS[index]
 
     @property
-    def nextPlayerColour(self):
-        if self.is_started and (not self.passed):
-            if self.current_player is self.BLACK:
-                return "White"
-            elif self.current_player is self.WHITE:
-                return "Black"
-            else:
-                return "None"
-        else:
-            # Reset passed flag
-            self.passed = False
-            if self.current_player is self.BLACK:
-                return "Black"
-            elif self.current_player is self.WHITE:
-                return "White"
-            else:
-                return "None"
+    def currentPlayerColour(self):
+        """it returns the current player colour"""
+        colour = "None"
+        if self.current_player is self.BLACK:
+            colour = "Black"
+        elif self.current_player is self.WHITE:
+            colour = "White"
+
+        return colour
+
 
     @property
     def playerPoints(self):
         """
-        Returns the player points as a json object.
+        Returns the player pointsAndTerritories as a json object.
         """
-        return "(B:{}, W:{})".format(self.point[self.BLACK], self.point[self.WHITE])
+        return self.point[self.BLACK], self.point[self.WHITE]
 
     @property
     def state(self):
         """
-        Returns the game state (board, current player, and points) as a tuple.
+        Returns the game state (board, current player, and pointsAndTerritories) as a tuple.
         """
-        return self.board_array[:], self.current_player, copy(self.point)
+        return deepcopy(self.board_array[:]), self.current_player, copy(self.point)

@@ -78,140 +78,120 @@
             </widget>
            </item>
            <item>
-            <widget class="QWidget" name="status_box" native="true">
+            <widget class="QLabel" name="next_player_label">
              <property name="maximumSize">
               <size>
                <width>300</width>
-               <height>50</height>
+               <height>25</height>
               </size>
              </property>
-             <layout class="QHBoxLayout" name="horizontalLayout_7">
-              <item>
-               <layout class="QHBoxLayout" name="horizontalLayout_6">
-                <item>
-                 <widget class="QLabel" name="moves_count_label">
-                  <property name="maximumSize">
-                   <size>
-                    <width>16777215</width>
-                    <height>25</height>
-                   </size>
-                  </property>
-                  <property name="text">
-                   <string>Moves: 30</string>
-                  </property>
-                  <property name="alignment">
-                   <set>Qt::AlignCenter</set>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QLabel" name="current_move_label">
-                  <property name="maximumSize">
-                   <size>
-                    <width>16777215</width>
-                    <height>25</height>
-                   </size>
-                  </property>
-                  <property name="text">
-                   <string>White: 3J</string>
-                  </property>
-                  <property name="alignment">
-                   <set>Qt::AlignCenter</set>
-                  </property>
-                 </widget>
-                </item>
-               </layout>
-              </item>
-             </layout>
-            </widget>
-           </item>
-           <item>
-            <widget class="QWidget" name="widget_4" native="true">
-             <widget class="QWidget" name="horizontalLayoutWidget_2">
-              <property name="geometry">
-               <rect>
-                <x>9</x>
-                <y>10</y>
-                <width>201</width>
-                <height>31</height>
-               </rect>
-              </property>
-              <layout class="QHBoxLayout" name="horizontalLayout_3">
-               <item>
-                <widget class="QLabel" name="current_player_label">
-                 <property name="maximumSize">
-                  <size>
-                   <width>300</width>
-                   <height>25</height>
-                  </size>
-                 </property>
-                 <property name="text">
-                  <string> Player:</string>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </widget>
-            </widget>
-           </item>
-           <item>
-            <widget class="QWidget" name="widget_3" native="true">
-             <property name="enabled">
-              <bool>true</bool>
+             <property name="text">
+              <string> Next Player: Black</string>
              </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="current_move_label">
              <property name="maximumSize">
               <size>
-               <width>300</width>
-               <height>50</height>
+               <width>16777215</width>
+               <height>25</height>
               </size>
              </property>
-             <widget class="QWidget" name="horizontalLayoutWidget">
-              <property name="geometry">
-               <rect>
-                <x>10</x>
-                <y>10</y>
-                <width>201</width>
-                <height>31</height>
-               </rect>
-              </property>
-              <layout class="QHBoxLayout" name="horizontalLayout_5">
-               <item>
-                <widget class="QLabel" name="points_label">
-                 <property name="maximumSize">
-                  <size>
-                   <width>300</width>
-                   <height>25</height>
-                  </size>
-                 </property>
-                 <property name="text">
-                  <string> Points: </string>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </widget>
-             <widget class="QWidget" name="widget_2" native="true">
-              <property name="geometry">
-               <rect>
-                <x>10</x>
-                <y>50</y>
-                <width>191</width>
-                <height>31</height>
-               </rect>
-              </property>
-             </widget>
+             <property name="text">
+              <string>Coordinates: A0</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
             </widget>
            </item>
            <item>
+            <widget class="QLabel" name="black_points">
+             <property name="text">
+              <string>Black Points: 0</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="white_points">
+             <property name="text">
+              <string>White Points: 0</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="black_territories">
+             <property name="text">
+              <string>Black Territories: 0</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="white_territories">
+             <property name="text">
+              <string>White Territories: 0</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="moves_count_label">
+             <property name="maximumSize">
+              <size>
+               <width>16777215</width>
+               <height>25</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>Total Moves: 0</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item alignment="Qt::AlignHCenter">
             <widget class="QLCDNumber" name="player_timer_dial">
              <property name="enabled">
               <bool>true</bool>
              </property>
-             <property name="maximumSize">
+             <property name="minimumSize">
               <size>
-               <width>16777215</width>
+               <width>200</width>
                <height>50</height>
               </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>200</width>
+               <height>70</height>
+              </size>
+             </property>
+             <property name="font">
+              <font>
+               <pointsize>30</pointsize>
+               <weight>75</weight>
+               <italic>false</italic>
+               <bold>true</bold>
+              </font>
+             </property>
+             <property name="focusPolicy">
+              <enum>Qt::StrongFocus</enum>
              </property>
              <property name="acceptDrops">
               <bool>false</bool>
@@ -261,13 +241,6 @@
                  </widget>
                 </item>
                 <item row="1" column="0">
-                 <widget class="QPushButton" name="undo_btn">
-                  <property name="text">
-                   <string>Undo</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="2" column="0">
                  <widget class="QPushButton" name="reset_btn">
                   <property name="text">
                    <string>Reset</string>
