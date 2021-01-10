@@ -1,6 +1,6 @@
-from PyQt5.QtWidgets import QFrame
 from PyQt5.QtCore import Qt, QBasicTimer, pyqtSignal, QPoint
 from PyQt5.QtGui import QPainter
+from PyQt5.QtWidgets import QFrame, QMessageBox
 
 from logic import GameLogic
 
@@ -97,18 +97,25 @@ class Board(QFrame):
         col = int(self.roundUp(event.x(), self.SQUARE_SIZE) / self.squareWidth())
         row = int(self.roundUp(event.y(), self.SQUARE_SIZE) / self.squareHeight())
 
-        click_loc = f'{chr(65 + col - 1)}{row}'  # map to letter-number format
+        clickLoc = f'{chr(65 + col - 1)}{row}'  # map to letter-number format
 
         if (0 < row < 8) and (0 < col < 8):
-            if not self.game_logic.tryMove(row - 1, col - 1):
-                print("tryMove({}, {}) failed".format(row - 1, col - 1))
-            else:
+            tryValue = self.game_logic.tryMove(row - 1, col - 1)
+            if tryValue == 0:
                 # if tryMove succeeds then update the next player colour
                 self.nextPlayerColourSignal.emit(self.game_logic.currentPlayerColour)
+            elif tryValue == 1:
+                self.showMoveResult("({}, {}) is not free".format(row - 1, col - 1))
+                print("tryMove({}, {}) failed".format(row - 1, col - 1))
+            elif tryValue == 2:
+                self.showMoveResult("(Move to {}, {}) is suicidal".format(row - 1, col - 1))
+            elif tryValue == 3:
+                self.showMoveResult("Move to ({}, {}) is KO".format(row - 1, col - 1))
+
         else:
             print("Out-of-band Calculated row: {}, col: {}", row, col)
 
-        self.clickLocationSignal.emit(click_loc)
+        self.clickLocationSignal.emit(clickLoc)
         self.pointsSignal.emit(self.game_logic.playerPoints)
         self.update()
 
@@ -165,3 +172,15 @@ class Board(QFrame):
                 center = QPoint(row, col)
                 painter.drawEllipse(center, radius1, radius2)
                 painter.restore()
+
+    def showMoveResult(self, moveResult):
+        """shows a dialog that displayes how the last move when if it fails"""
+        msg = QMessageBox()
+        msg.setIcon(QMessageBox.Warning)
+
+        msg.setText("Unsuccessful Move")
+        msg.setWindowTitle("Unsuccessful Move")
+        msg.setInformativeText(moveResult)
+        msg.setStandardButtons(QMessageBox.Ok)
+
+        msg.exec_()

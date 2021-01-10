@@ -50,14 +50,19 @@ class GameLogic:
 
     def tryMove(self, x, y):
         """
-        Move to the given coordinates for the current player. Returns true if successful
+        Move to the given coordinates for the current player.
+        Returns:
+            0 - if it was successful
+            1 - if the coordinate is not free
+            2 - if the move is a suicide move
+            3 - if the move is a KO move
         """
         # Game has started
         self.is_started = True
         # Check if coordinates are occupied
         if self.board_array[x][y] is not self.FREE:
             print('The coordinate is not free!')
-            return False
+            return 1
 
         # Store state
         self.saveData()
@@ -72,14 +77,14 @@ class GameLogic:
                 # Set the coordinates back to free as we are not making a move
                 self.board_array[x][y] = self.FREE
                 print('It is a suicidal move!')
-                return False
+                return 2
 
         # Check for KO tryMove
         if self.isKo():
             # Set the coordinates back to free as we are not making a move
             self.board_array[x][y] = self.FREE
             print('It is a KO move!')
-            return False
+            return 3
 
         # reset pass_counts_without_move
         self.pass_counts_without_move = {
@@ -89,8 +94,8 @@ class GameLogic:
 
         # Move on to the next player
         self.changePlayerTurn()
-        # Return true as we succeeded all the previous steps
-        return True
+        # Return 0 as we succeeded all the previous steps
+        return 0
 
     def changePlayerTurn(self):
         """

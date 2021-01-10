@@ -146,11 +146,15 @@ class GoApp(Ui_Main, QtWidgets.QMainWindow):
 
     def changeTurns(self):
         """gives turn to the other player"""
-        if self.board.game_logic.passTurn():
-            self.showWinnerDialog(self.board.game_logic.currentPlayerColour)
-        # this may cause to a confusion, but game_logic.currentPlayerColour is always the next player
-        # after the click on the board is finished
-        self.setNextPlayerColour(self.board.game_logic.currentPlayerColour)
+        button_reply = QtWidgets.QMessageBox.question(self, 'Pass Confirmation', "Are you sure to pass your turn?",
+                                                      QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No,
+                                                      QtWidgets.QMessageBox.No)
+        if button_reply == QtWidgets.QMessageBox.Yes:
+            if self.board.game_logic.passTurn():
+                self.showWinnerDialog(self.board.game_logic.currentPlayerColour)
+            # this may cause to a confusion, but game_logic.currentPlayerColour is always the next player
+            # after the click on the board is finished
+            self.setNextPlayerColour(self.board.game_logic.currentPlayerColour)
 
     def pointsAndTerritories(self):
         """calculates player points and territories"""
@@ -166,10 +170,19 @@ class GoApp(Ui_Main, QtWidgets.QMainWindow):
         self.black_territories.setText("Black Territories: " + str(black_territories))
         self.white_territories.setText("White Territories: " + str(white_territories))
 
-    def resetGame(self):
+    def resetGame(self, hideDialog):
         """resets the game board by clearing all states"""
         self.moveCount = -1
-        return self.board.resetGame()
+
+        # we don't need confirmation dialog to reset the board after a winner detected
+        if hideDialog:
+            self.board.resetGame()
+        else:
+            button_reply = QtWidgets.QMessageBox.question(self, 'Reset Confirmation', "Reset Game?",
+                                                          QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No,
+                                                          QtWidgets.QMessageBox.No)
+            if button_reply == QtWidgets.QMessageBox.Yes:
+                self.board.resetGame()
 
     def setNextPlayerColour(self, nextPlayer):
         """updates the label to show the next player name/colour"""
@@ -195,4 +208,4 @@ class GoApp(Ui_Main, QtWidgets.QMainWindow):
 
     def winnerConfirmation(self, i):
         """resets the game after the OK button is pressed on the dialog box"""
-        self.resetGame()
+        self.resetGame(True)
