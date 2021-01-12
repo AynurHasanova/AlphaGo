@@ -315,7 +315,10 @@ class GameLogic:
         return set()
 
     def undo(self):
-        self.board_array, self.current_player, self.point = self.game_data.pop()
+        try:
+            self.board_array, self.current_player, self.point = self.game_data.pop()
+        except IndexError:
+            return
         self.updateSignal.emit()
 
     def getLiberties(self, x, y):
