@@ -23,11 +23,11 @@ class Board(QFrame):
     )
 
     # All the App's signals
-    pointsSignal = pyqtSignal(tuple)  # used to send pointsAndTerritories to the score_board
-    updateTimerSignal = pyqtSignal(int)  # signal sent when timer is updated
-    clickLocationSignal = pyqtSignal(str)  # signal sent when there is a new click location
-    nextPlayerColourSignal = pyqtSignal(str)  # signal sent with the next player name
-    updateBoardSignal = pyqtSignal()
+    pointsSignal = pyqtSignal(tuple)            # used to send pointsAndTerritories to the score_board
+    updateTimerSignal = pyqtSignal(int)         # signal sent when timer is updated
+    clickLocationSignal = pyqtSignal(str)       # signal sent when there is a new click location
+    nextPlayerColourSignal = pyqtSignal(str)    # signal sent with the next player name
+    updateBoardSignal = pyqtSignal()            # signal sent to to update the board anytime
 
     def __init__(self, parent, board_width):
         super().__init__(parent)
@@ -49,7 +49,7 @@ class Board(QFrame):
         self.game_logic = GameLogic(self.board_array, self.updateBoardSignal)
 
         self.printBoardArray()
-        self.start()  # start the game which will start the timer
+        self.start()                            # start the game which will start the timer
 
     def printBoardArray(self):
         """ prints the board_array in an attractive way """
@@ -120,7 +120,7 @@ class Board(QFrame):
 
         self.clickLocationSignal.emit(clickLoc)
         self.pointsSignal.emit(self.game_logic.playerPoints)
-        self.update()
+        self.updateBoardSignal.emit()
 
     def resetGame(self):
         """ Clears pieces from the board """
@@ -130,7 +130,7 @@ class Board(QFrame):
         self.pointsSignal.emit(self.game_logic.playerPoints)
         self.updateTimerSignal.emit(self.counter)
         # We need to call update to trigger paintEvent
-        self.update()
+        self.updateBoardSignal.emit()
 
     def drawSquares(self, painter):
         """ This method draws the board based on the given dimensions """

@@ -1,5 +1,7 @@
 from copy import copy, deepcopy
 
+from PyQt5.QtCore import pyqtSignal
+
 
 class GameLogic:
     print("Game Logic Object Created")
@@ -13,10 +15,10 @@ class GameLogic:
         WHITE,
     )
 
-    def __init__(self, board_array, updateSignal):
+    def __init__(self, board_array, update_signal: pyqtSignal):
         self.board_array = board_array
 
-        self.updateSignal = updateSignal
+        self.updateSignal = update_signal
 
         # The blacks starts first by the rules
         self.current_player = self.BLACK

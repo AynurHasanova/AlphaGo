@@ -52,7 +52,6 @@ class GoApp(Ui_Main, QtWidgets.QMainWindow):
         self.actionHelp.setShortcut('Ctrl+H')
         self.actionHelp.setIcon(QIcon('./assets/help.png'))
 
-
     def setMoves(self, pos):
         """increments the total move count"""
         self.moveCount += 1
