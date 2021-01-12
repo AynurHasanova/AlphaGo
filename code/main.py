@@ -158,8 +158,8 @@ class GoApp(Ui_Main, QtWidgets.QMainWindow):
 
     def pointsAndTerritories(self):
         """calculates player points and territories"""
-        self.black_points.setText("Black Points: " + str(self.board.game_logic.playerPoints[0]))
-        self.white_points.setText("White Points: " + str(self.board.game_logic.playerPoints[1]))
+        self.black_points.setText("Black: " + str(self.board.game_logic.playerPoints[0]))
+        self.white_points.setText("White: " + str(self.board.game_logic.playerPoints[1]))
 
         black_territories = 0
         white_territories = 0
@@ -167,8 +167,8 @@ class GoApp(Ui_Main, QtWidgets.QMainWindow):
             black_territories += row.count(self.board.BLACK)
             white_territories += row.count(self.board.WHITE)
 
-        self.black_territories.setText("Black Territories: " + str(black_territories))
-        self.white_territories.setText("White Territories: " + str(white_territories))
+        self.black_territories.setText("Black: " + str(black_territories))
+        self.white_territories.setText("White: " + str(white_territories))
 
     def resetGame(self, hideDialog):
         """resets the game board by clearing all states"""
