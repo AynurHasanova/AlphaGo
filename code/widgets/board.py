@@ -27,6 +27,7 @@ class Board(QFrame):
     updateTimerSignal = pyqtSignal(int)  # signal sent when timer is updated
     clickLocationSignal = pyqtSignal(str)  # signal sent when there is a new click location
     nextPlayerColourSignal = pyqtSignal(str)  # signal sent with the next player name
+    updateBoardSignal = pyqtSignal()
 
     def __init__(self, parent, board_width):
         super().__init__(parent)
@@ -37,15 +38,17 @@ class Board(QFrame):
         # start with a black player
         self.turn = self.BLACK
 
+        self.updateBoardSignal.connect(self.update)
+
         # create a timer for the game
         self.timer = QBasicTimer()
         self.isStarted = False
-
         self.board_width = self.board_height = board_width
-        self.game_logic = GameLogic(self.board_width)
+
+        self.board_array = [[0 for _ in range(board_width)] for _ in range(board_width)]
+        self.game_logic = GameLogic(self.board_array, self.updateBoardSignal)
 
         self.printBoardArray()
-
         self.start()  # start the game which will start the timer
 
     def printBoardArray(self):

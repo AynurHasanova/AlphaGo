@@ -13,8 +13,10 @@ class GameLogic:
         WHITE,
     )
 
-    def __init__(self, board_width):
-        self.board_array = [[0 for _ in range(board_width)] for _ in range(board_width)]
+    def __init__(self, board_array, updateSignal):
+        self.board_array = board_array
+
+        self.updateSignal = updateSignal
 
         # The blacks starts first by the rules
         self.current_player = self.BLACK
@@ -310,6 +312,10 @@ class GameLogic:
         # if surrounding_coords was empty we reach here and return an empty set
         return set()
 
+    def undo(self):
+        self.board_array, self.current_player, self.point = self.game_data.pop()
+        self.updateSignal.emit()
+
     def getLiberties(self, x, y):
         """
         Collects the coordinates for liberties surrounding the group at the given
@@ -346,7 +352,6 @@ class GameLogic:
             colour = "White"
 
         return colour
-
 
     @property
     def playerPoints(self):

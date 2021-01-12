@@ -38,6 +38,7 @@ class GoApp(Ui_Main, QtWidgets.QMainWindow):
         self.board.pointsSignal.connect(self.pointsAndTerritories)
 
         self.pass_btn.clicked.connect(self.changeTurns)
+        self.undo_btn.clicked.connect(self.board.game_logic.undo)
         self.reset_btn.clicked.connect(self.resetGame)
 
         self.actionAbout.triggered.connect(self.aboutCall)
