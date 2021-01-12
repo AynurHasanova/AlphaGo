@@ -49,7 +49,7 @@ class Board(QFrame):
         self.game_logic = GameLogic(self.board_array, self.updateBoardSignal)
 
         self.printBoardArray()
-        self.start()                            # start the game which will start the timer
+        self.clearTimer()                       # start the game which will start the timer
 
     def printBoardArray(self):
         """ prints the board_array in an attractive way """
@@ -64,7 +64,7 @@ class Board(QFrame):
         """ returns the height of one square of the board """
         return self.SQUARE_SIZE
 
-    def start(self):
+    def clearTimer(self):
         """ Starts game """
         # set the boolean which determines if the game has started to TRUE
         self.isStarted = True
@@ -72,6 +72,13 @@ class Board(QFrame):
         # start the timer with the correct speed
         self.timer.start(self.timerSpeed, self)
         print("start () - timer is started")
+
+    def resetTimer(self):
+        self.counter = 100
+
+        # Here the timer is recreated so it will reset the timer to abs. zero
+        self.clearTimer()
+        self.updateTimerSignal.emit(self.counter)
 
     def timerEvent(self, event):
         """ This event is automatically called when the timer is updated. based on the timerSpeed variable """
@@ -120,6 +127,7 @@ class Board(QFrame):
 
         self.clickLocationSignal.emit(clickLoc)
         self.pointsSignal.emit(self.game_logic.playerPoints)
+        self.resetTimer()
         self.updateBoardSignal.emit()
 
     def resetGame(self):
