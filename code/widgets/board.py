@@ -1,13 +1,22 @@
+import os
+from pathlib import Path
+
+from PyQt5 import QtGui
 from PyQt5.QtCore import Qt, QBasicTimer, pyqtSignal, QPoint
 from PyQt5.QtGui import QPainter
 from PyQt5.QtWidgets import QFrame, QMessageBox
 
 from logic import GameLogic
+from utils import Color
+
+BASE_PATH = Path(__file__).resolve().parent.parent
 
 
 class Board(QFrame):
     # Board default values
     # This is size of each cells of squares on the Go Board
+
+
     SQUARE_SIZE = 50
     EMPTY = 0
     BLACK = 1
@@ -34,10 +43,11 @@ class Board(QFrame):
         super().__init__(parent)
         self.init_board(board_width)
 
-
     def init_board(self, board_width):
         # start with a black player
         self.turn = self.BLACK
+
+        print(Color.WARNING + Color.BOLD, Path(__file__).resolve().parent.parent, Color.ENDLINE)
 
         self.updateBoardSignal.connect(self.update)
         self.gameStartedSignal.connect(self.setGameStarted)
@@ -50,6 +60,8 @@ class Board(QFrame):
         self.board_array = [[0 for _ in range(board_width)] for _ in range(board_width)]
         self.game_logic = GameLogic(self.board_array, self.updateBoardSignal)
 
+        # self.setBoardCursor()
+
         self.printBoardArray()
         self.clearTimer()                       # start the game which will start the timer
 
@@ -57,6 +69,14 @@ class Board(QFrame):
         """ prints the board_array in an attractive way """
         print("board_array:")
         print('\n'.join(['\t'.join([str(cell) for cell in row]) for row in self.game_logic.board_array]))
+
+    # TODO Add Animated and Custom Cursor
+    def setBoardCursor(self):
+        self.cursor_pix = QtGui.QBitmap(os.path.join(BASE_PATH, 'assets/help.png'))
+        # self.cursor_pix = QtGui.QBitmap
+        # self.cursor_pix = self.cursor_pix.scaled(10, 10)
+        self.current_curs = QtGui.QCursor(self.cursor_pix)
+        self.setCursor(self.current_curs)
 
     def squareWidth(self):
         """ returns the width of one square in the board """
