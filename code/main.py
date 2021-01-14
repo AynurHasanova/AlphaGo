@@ -155,6 +155,7 @@ class GoApp(Ui_Main, QtWidgets.QMainWindow):
             # this may cause to a confusion, but game_logic.currentPlayerColour is always the next player
             # after the click on the board is finished
             self.setNextPlayerColour(self.board.game_logic.currentPlayerColour)
+            self.board.resetTimer()
 
     def pointsAndTerritories(self):
         """calculates player points and territories"""
@@ -182,6 +183,7 @@ class GoApp(Ui_Main, QtWidgets.QMainWindow):
                                                           QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No,
                                                           QtWidgets.QMessageBox.No)
             if button_reply == QtWidgets.QMessageBox.Yes:
+                self.board.resetTimer()
                 self.board.resetGame()
 
     def setNextPlayerColour(self, nextPlayer):

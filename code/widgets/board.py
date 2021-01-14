@@ -28,6 +28,7 @@ class Board(QFrame):
     clickLocationSignal = pyqtSignal(str)       # signal sent when there is a new click location
     nextPlayerColourSignal = pyqtSignal(str)    # signal sent with the next player name
     updateBoardSignal = pyqtSignal()            # signal sent to to update the board anytime
+    gameStartedSignal = pyqtSignal(bool)
 
     def __init__(self, parent, board_width):
         super().__init__(parent)
@@ -39,6 +40,7 @@ class Board(QFrame):
         self.turn = self.BLACK
 
         self.updateBoardSignal.connect(self.update)
+        self.gameStartedSignal.connect(self.setGameStarted)
 
         # create a timer for the game
         self.timer = QBasicTimer()
@@ -59,6 +61,11 @@ class Board(QFrame):
     def squareWidth(self):
         """ returns the width of one square in the board """
         return self.SQUARE_SIZE
+
+    def setGameStarted(self, state):
+        self.isStarted = state
+        if state:
+            self.timer.stop()
 
     def squareHeight(self):
         """ returns the height of one square of the board """

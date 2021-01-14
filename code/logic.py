@@ -2,6 +2,8 @@ from copy import copy, deepcopy
 
 from PyQt5.QtCore import pyqtSignal
 
+from utils import Color
+
 
 class GameLogic:
     print("Game Logic Object Created")
@@ -65,11 +67,15 @@ class GameLogic:
         self.is_started = True
         # Check if coordinates are occupied
         if self.board_array[x][y] is not self.FREE:
-            print('The coordinate is not free!')
+            print(Color.WARNING + Color.BOLD + 'The coordinate is not free!' + Color.ENDLINE)
             return 1
 
-        # Store state
+        print(Color.WARNING + Color.BOLD + f"x: {x}\ty: {y}" + Color.ENDLINE)
+
+        # First Save State
         self.saveData()
+
+        # Update the board_array
         self.board_array[x][y] = self.current_player
 
         # Check if any stones have been captured
