@@ -157,7 +157,7 @@ class GameLogic:
     def captureStones(self, x, y):
         """
         If any stones was taken by the last tryMove at the given
-        coordinates then removes it from the game and adds it up the pointsAndTerritories.
+        coordinates then removes it from the game and adds it up the points.
         """
         points = []
         for c, (x1, y1) in self.getSurroundingCoords(x, y):
