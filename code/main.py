@@ -45,6 +45,8 @@ class GoApp(Ui_Main, QtWidgets.QMainWindow):
         self.actionAbout.setShortcut('Ctrl+A')
         self.actionAbout.setIcon(QIcon('./assets/about.png'))
 
+        self.saveGame_action.triggered.connect(self.board.saveGame)
+
         self.actionExit.triggered.connect(self.exitCall)
         self.actionExit.setShortcut('Ctrl+Q')
         self.actionExit.setIcon(QIcon('./assets/exit.png'))

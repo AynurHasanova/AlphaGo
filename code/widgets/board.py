@@ -1,7 +1,9 @@
 import os
+import pickle
+from copy import deepcopy
 from pathlib import Path
 
-from PyQt5 import QtGui
+from PyQt5 import QtGui, QtCore, QtWidgets
 from PyQt5.QtCore import Qt, QBasicTimer, pyqtSignal, QPoint
 from PyQt5.QtGui import QPainter
 from PyQt5.QtWidgets import QFrame, QMessageBox
@@ -15,8 +17,6 @@ BASE_PATH = Path(__file__).resolve().parent.parent
 class Board(QFrame):
     # Board default values
     # This is size of each cells of squares on the Go Board
-
-
     SQUARE_SIZE = 50
     EMPTY = 0
     BLACK = 1
@@ -42,6 +42,10 @@ class Board(QFrame):
     def __init__(self, parent, board_width):
         super().__init__(parent)
         self.init_board(board_width)
+
+        # This will be used for saving the game to a file
+        self.isSaved = False
+        self.path = None
 
     def init_board(self, board_width):
         # start with a black player
@@ -73,8 +77,6 @@ class Board(QFrame):
     # TODO Add Animated and Custom Cursor
     def setBoardCursor(self):
         self.cursor_pix = QtGui.QBitmap(os.path.join(BASE_PATH, 'assets/help.png'))
-        # self.cursor_pix = QtGui.QBitmap
-        # self.cursor_pix = self.cursor_pix.scaled(10, 10)
         self.current_curs = QtGui.QCursor(self.cursor_pix)
         self.setCursor(self.current_curs)
 
@@ -156,6 +158,28 @@ class Board(QFrame):
         self.pointsSignal.emit(self.game_logic.playerPoints)
         self.resetTimer()
         self.updateBoardSignal.emit()
+
+    def saveGame(self):
+        if not self.isSaved:
+            # Get the file name
+            fileName, _ = QtWidgets.QFileDialog.getSaveFileName(self,
+                                                                "All files",
+                                                                QtCore.QDir.homePath(),
+                                                                "AlphaGo Game (*.alg);; Pickle File (*.pickle)")
+            # If the user cancelled the dialog
+            if not fileName:
+                QtWidgets.QMessageBox.warning(self, 'File Not given', 'No file was provided')
+            else:
+                # Copy the exact state of the state at that moment
+                state = deepcopy(self.game_logic.state)
+                try:
+                    with open(fileName, 'wb') as fp:
+                        pickle.dump(state, fp)
+                    self.isSaved = True
+                    self.path = fileName
+                    QtWidgets.QMessageBox.information(self, 'Successful', 'Your Game is now saved')
+                except OSError:
+                    QtWidgets.QMessageBox.critical(self, 'Error', 'An error occurred')
 
     def resetGame(self):
         """ Clears pieces from the board """

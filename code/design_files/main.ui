@@ -37,9 +37,6 @@
         <property name="toolTip">
          <string/>
         </property>
-        <property name="styleSheet">
-         <string notr="true">background-color: rgb(255, 255, 127);</string>
-        </property>
         <layout class="QVBoxLayout" name="verticalLayout_5">
          <item>
           <layout class="QVBoxLayout" name="mainBoard_layout"/>
@@ -355,6 +352,9 @@
     <property name="title">
      <string>File</string>
     </property>
+    <addaction name="newGame_action"/>
+    <addaction name="openGame_action"/>
+    <addaction name="saveGame_action"/>
     <addaction name="actionExit"/>
    </widget>
    <widget class="QMenu" name="help_menu">
@@ -412,6 +412,14 @@
   <action name="actionHelp">
    <property name="text">
     <string>Help</string>
+   </property>
+  </action>
+  <action name="saveGame_action">
+   <property name="text">
+    <string>Save Game</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
    </property>
   </action>
  </widget>
