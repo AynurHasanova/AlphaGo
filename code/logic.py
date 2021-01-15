@@ -160,10 +160,11 @@ class GameLogic:
         coordinates then removes it from the game and adds it up the points.
         """
         points = []
+        # get all surrounding coordinates to a location
         for c, (x1, y1) in self.getSurroundingCoords(x, y):
+            # if the surrounding is the next player with no liberties then take it
             if c is self.nextPlayer and self.numLiberties(x1, y1) == 0:
                 point = self.captureStoneGroup(x1, y1)
-                print("Captured pointsAndTerritories: ", point)
                 points.append(point)
                 self.addPoint(point)
         return sum(points)
@@ -202,7 +203,7 @@ class GameLogic:
 
     def addPoint(self, point):
         """
-        Adds point to the current player's total pointsAndTerritories.
+        Adds point to the current player's total points.
         """
         self.point[self.current_player] += point
         print("self.point: ", self.point)
@@ -351,13 +352,13 @@ class GameLogic:
     @property
     def playerPoints(self):
         """
-        Returns the player pointsAndTerritories as a json object.
+        Returns the player points as a json object.
         """
         return self.point[self.BLACK], self.point[self.WHITE]
 
     @property
     def state(self):
         """
-        Returns the game state (board, current player, and pointsAndTerritories) as a tuple.
+        Returns the game state (board, current player, and points) as a tuple.
         """
         return deepcopy(self.board_array[:]), self.current_player, copy(self.point)
