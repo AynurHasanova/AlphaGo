@@ -169,6 +169,7 @@ class Board(QFrame):
             new_state = pickle.load(fp)
         print(new_state)
         self.game_logic.state = deepcopy(new_state)
+        self.nextPlayerColourSignal.emit(self.game_logic.currentPlayerColour)
         self.update()
 
     def saveGame(self):
