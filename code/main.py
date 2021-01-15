@@ -5,6 +5,7 @@ from PyQt5.QtWidgets import QDialog, QTextEdit, QMessageBox
 
 # Main widgets
 from widgets.board import Board
+from widgets.game_size import Ui_GameSize
 from widgets.main_layout import Ui_Main
 
 
@@ -14,14 +15,12 @@ class GoApp(Ui_Main, QtWidgets.QMainWindow):
     properties together here. It will also be called in the entry point
     """
 
-    # Default values
-    board_width = 7
-
-    def __init__(self, *args, **kwargs):
+    def __init__(self, board_width, *args, **kwargs):
         super(GoApp, self).__init__(*args, **kwargs)
         self.setupUi(self)
         self.menubar.setNativeMenuBar(False)
 
+        self.board_width = board_width
         self.moveCount = 0
 
         # Attach main Widgets
@@ -199,14 +198,13 @@ class GoApp(Ui_Main, QtWidgets.QMainWindow):
         print("Next Player: " + nextPlayer)
         self.next_player_label.setText("Next Player: " + nextPlayer)
 
-
     def showWinnerDialog(self, player):
         """shows a dialog box when a user loses the game"""
         msg = QMessageBox()
         msg.setIcon(QMessageBox.Warning)
 
         msg.setText("Winner Detected")
-       # msg.setInformativeText(f"Player {player} lost the game!")
+        # msg.setInformativeText(f"Player {player} lost the game!")
         msg.setWindowTitle("Winner Detected")
         msg.setInformativeText(f"Player {player} lost the game!")
         msg.setDetailedText(f"Player {player} lost the game as this player passed his/her turn twice consecutively")
@@ -219,3 +217,23 @@ class GoApp(Ui_Main, QtWidgets.QMainWindow):
     def winnerConfirmation(self, i):
         """resets the game after the OK button is pressed on the dialog box"""
         self.resetGame(True)
+
+
+class GameSize(Ui_GameSize, QtWidgets.QDialog):
+
+    def __init__(self):
+        super(GameSize, self).__init__()
+        self.setupUi(self)
+        self.game_size = None
+
+        self.beginner_option.clicked.connect(lambda: self.setGameSize(7))
+        self.medium_option.clicked.connect(lambda: self.setGameSize(13))
+        self.expert_option.clicked.connect(lambda: self.setGameSize(19))
+
+    def setGameSize(self, val: int):
+        self.game_size = val
+
+    def accept(self) -> None:
+        go = GoApp(self.game_size)
+        go.show()
+        super(GameSize, self).accept()
