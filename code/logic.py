@@ -377,3 +377,7 @@ class GameLogic:
         Returns the game state (board, current player, and pointsAndTerritories) as a tuple.
         """
         return deepcopy(self.board_array[:]), self.current_player, copy(self.point)
+
+    @state.setter
+    def state(self, value):
+        self.board_array, self.current_player, self.point = value

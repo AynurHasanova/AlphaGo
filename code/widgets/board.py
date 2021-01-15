@@ -32,11 +32,11 @@ class Board(QFrame):
     )
 
     # All the App's signals
-    pointsSignal = pyqtSignal(tuple)            # used to send pointsAndTerritories to the score_board
-    updateTimerSignal = pyqtSignal(int)         # signal sent when timer is updated
-    clickLocationSignal = pyqtSignal(str)       # signal sent when there is a new click location
-    nextPlayerColourSignal = pyqtSignal(str)    # signal sent with the next player name
-    updateBoardSignal = pyqtSignal()            # signal sent to to update the board anytime
+    pointsSignal = pyqtSignal(tuple)  # used to send pointsAndTerritories to the score_board
+    updateTimerSignal = pyqtSignal(int)  # signal sent when timer is updated
+    clickLocationSignal = pyqtSignal(str)  # signal sent when there is a new click location
+    nextPlayerColourSignal = pyqtSignal(str)  # signal sent with the next player name
+    updateBoardSignal = pyqtSignal()  # signal sent to to update the board anytime
     gameStartedSignal = pyqtSignal(bool)
 
     def __init__(self, parent, board_width):
@@ -67,7 +67,7 @@ class Board(QFrame):
         # self.setBoardCursor()
 
         self.printBoardArray()
-        self.clearTimer()                       # start the game which will start the timer
+        self.clearTimer()  # start the game which will start the timer
 
     def printBoardArray(self):
         """ prints the board_array in an attractive way """
@@ -159,24 +159,36 @@ class Board(QFrame):
         self.resetTimer()
         self.updateBoardSignal.emit()
 
+    def openGame(self):
+        # Get the file name
+        file_name, _ = QtWidgets.QFileDialog.getOpenFileName(self,
+                                                             "All files",
+                                                             QtCore.QDir.homePath(),
+                                                             "AlphaGo Game (*.alg);; Pickle File (*.pickle)")
+        with open(file_name, 'rb') as fp:
+            new_state = pickle.load(fp)
+        print(new_state)
+        self.game_logic.state = deepcopy(new_state)
+        self.update()
+
     def saveGame(self):
         if not self.isSaved:
             # Get the file name
-            fileName, _ = QtWidgets.QFileDialog.getSaveFileName(self,
-                                                                "All files",
-                                                                QtCore.QDir.homePath(),
-                                                                "AlphaGo Game (*.alg);; Pickle File (*.pickle)")
+            file_name, _ = QtWidgets.QFileDialog.getSaveFileName(self,
+                                                                 "All files",
+                                                                 QtCore.QDir.homePath(),
+                                                                 "AlphaGo Game (*.alg);; Pickle File (*.pickle)")
             # If the user cancelled the dialog
-            if not fileName:
+            if not file_name:
                 QtWidgets.QMessageBox.warning(self, 'File Not given', 'No file was provided')
             else:
                 # Copy the exact state of the state at that moment
                 state = deepcopy(self.game_logic.state)
                 try:
-                    with open(fileName, 'wb') as fp:
+                    with open(file_name, 'wb') as fp:
                         pickle.dump(state, fp)
                     self.isSaved = True
-                    self.path = fileName
+                    self.path = file_name
                     QtWidgets.QMessageBox.information(self, 'Successful', 'Your Game is now saved')
                 except OSError:
                     QtWidgets.QMessageBox.critical(self, 'Error', 'An error occurred')

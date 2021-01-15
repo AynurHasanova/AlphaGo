@@ -45,7 +45,9 @@ class GoApp(Ui_Main, QtWidgets.QMainWindow):
         self.actionAbout.setShortcut('Ctrl+A')
         self.actionAbout.setIcon(QIcon('./assets/about.png'))
 
+        self.newGame_action.triggered.connect(self.newGame)
         self.saveGame_action.triggered.connect(self.board.saveGame)
+        self.openGame_action.triggered.connect(self.board.openGame)
 
         self.actionExit.triggered.connect(self.exitCall)
         self.actionExit.setShortcut('Ctrl+Q')
@@ -53,6 +55,10 @@ class GoApp(Ui_Main, QtWidgets.QMainWindow):
         self.actionHelp.triggered.connect(self.helpCall)
         self.actionHelp.setShortcut('Ctrl+H')
         self.actionHelp.setIcon(QIcon('./assets/help.png'))
+
+    def newGame(self):
+        window = GoApp(self)
+        window.show()
 
     def setMoves(self, pos):
         """increments the total move count"""
