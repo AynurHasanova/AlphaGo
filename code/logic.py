@@ -165,6 +165,7 @@ class GameLogic:
             # if the surrounding is the next player with no liberties then take it
             if c is self.nextPlayer and self.numLiberties(x1, y1) == 0:
                 point = self.captureStoneGroup(x1, y1)
+                # add the point into the list to sum it up later
                 points.append(point)
                 self.addPoint(point)
         return sum(points)
