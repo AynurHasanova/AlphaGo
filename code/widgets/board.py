@@ -138,7 +138,7 @@ class Board(QFrame):
 
         clickLoc = f'{chr(65 + col - 1)}{row}'  # map to letter-number format
 
-        if (0 < row < self.board_width) and (0 < col < self.board_width):
+        if (0 < row < self.board_width + 1) and (0 < col < self.board_width + 1):
             tryValue = self.game_logic.tryMove(row - 1, col - 1)
             if tryValue == 0:
                 # if tryMove succeeds then update the next player colour
