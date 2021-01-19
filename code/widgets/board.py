@@ -38,6 +38,7 @@ class Board(QFrame):
     nextPlayerColourSignal = pyqtSignal(str)  # signal sent with the next player name
     updateBoardSignal = pyqtSignal()  # signal sent to to update the board anytime
     gameStartedSignal = pyqtSignal(bool)
+    timeOutSignal = pyqtSignal()
 
     def __init__(self, parent, board_width):
         super().__init__(parent)
@@ -103,7 +104,7 @@ class Board(QFrame):
         print("start () - timer is started")
 
     def resetTimer(self):
-        self.counter = 100
+        self.counter = Board.counter
 
         # Here the timer is recreated so it will reset the timer to abs. zero
         self.clearTimer()
@@ -113,8 +114,8 @@ class Board(QFrame):
         """ This event is automatically called when the timer is updated. based on the timerSpeed variable """
         # TODO adapter this code to handle your timers
         if event.timerId() == self.timer.timerId():  # if the timer that has 'ticked' is the one in this class
-            if Board.counter == 0:
-                print("Game over")
+            if self.counter == 1:
+                self.timeOutSignal.emit()
             self.counter -= 1
             self.updateTimerSignal.emit(self.counter)
         else:

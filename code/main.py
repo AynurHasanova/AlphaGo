@@ -35,6 +35,7 @@ class GoApp(Ui_Main, QtWidgets.QMainWindow):
         self.board.clickLocationSignal.connect(self.setMoves)
         self.board.nextPlayerColourSignal.connect(self.setNextPlayerColour)
         self.board.pointsSignal.connect(self.pointsAndTerritories)
+        self.board.timeOutSignal.connect(self.timeOutPlayer)
 
         self.pass_btn.clicked.connect(self.changeTurns)
         self.undo_btn.clicked.connect(self.board.game_logic.undo)
@@ -197,6 +198,18 @@ class GoApp(Ui_Main, QtWidgets.QMainWindow):
         """updates the label to show the next player name/colour"""
         print("Next Player: " + nextPlayer)
         self.next_player_label.setText("Next Player: " + nextPlayer)
+
+    def timeOutPlayer(self):
+        """gives turn to the other player"""
+        QtWidgets.QMessageBox.information(self,
+                                          "Timeout",
+                                          "Next Player's turn")
+        if self.board.game_logic.passTurn():
+            self.showWinnerDialog(self.board.game_logic.currentPlayerColour)
+        # this may cause to a confusion, but game_logic.currentPlayerColour is always the next player
+        # after the click on the board is finished
+        self.setNextPlayerColour(self.board.game_logic.currentPlayerColour)
+        self.board.resetTimer()
 
     def showWinnerDialog(self, player):
         """shows a dialog box when a user loses the game"""
