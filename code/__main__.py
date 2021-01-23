@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import QApplication
-from main import GoApp, GameSize
+from main import GoApp
 import sys
 
 

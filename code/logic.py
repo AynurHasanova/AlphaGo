@@ -8,10 +8,12 @@ from utils import Color
 class GameLogic:
     print("Game Logic Object Created")
 
+    # The following variables are used to indicate the state of a cell on the board
     FREE = 0
     BLACK = 1
     WHITE = 2
 
+    # The tuple of players
     PLAYERS = (
         BLACK,
         WHITE,
@@ -51,7 +53,10 @@ class GameLogic:
             self.WHITE: 0,
         }
 
-        # Stores the historical data of the current game
+        # A list that stores the historical data of the current game
+        # it is used a stack when doing undo.
+        # On the other hand when it is used for capturing and checking for KO it is used as queue
+        # to implement a breadth-first search
         self.game_data = []
 
     def tryMove(self, x, y):
@@ -190,8 +195,6 @@ class GameLogic:
 
         self.board_array = state[0]
         self.current_player = state[1]
-        print("game_data: ", self.game_data)
-        print("self.point: ", self.point, ", state[2]: ", state[2])
         self.point = state[2]
 
     def saveData(self):
@@ -217,7 +220,6 @@ class GameLogic:
         Adds point to the current player's total points.
         """
         self.point[self.current_player] += point
-        print("self.point: ", self.point)
 
     def xyValue(self, x, y):
         """
@@ -304,9 +306,6 @@ class GameLogic:
             for c, (i, j) in self.getSurroundingCoords(x, y)
             if (c is colour or c is self.FREE) and (i, j) not in visited
         ]
-
-        # print("surrounding_coords: ", surrounding_coords, ", visited: ", visited, ", colour: ", colour)
-        # print("l.self.getSurroundingCoords({}, {}): {}".format(x, y, self.getSurroundingCoords(x, y)))
 
         # Mark current coordinates as having been visited to avoid double processing/loop
         visited.add((x, y))
