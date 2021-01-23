@@ -5,6 +5,7 @@ from PyQt5.QtWidgets import QDialog, QTextEdit, QMessageBox
 
 # Main widgets
 from widgets.board import Board
+from widgets.game_size import Ui_GameSize
 from widgets.main_layout import Ui_Main
 
 
@@ -14,14 +15,12 @@ class GoApp(Ui_Main, QtWidgets.QMainWindow):
     properties together here. It will also be called in the entry point
     """
 
-    # Default values
-    board_width = 7
-
-    def __init__(self, *args, **kwargs):
+    def __init__(self, board_width, *args, **kwargs):
         super(GoApp, self).__init__(*args, **kwargs)
         self.setupUi(self)
         self.menubar.setNativeMenuBar(False)
 
+        self.board_width = board_width
         self.moveCount = 0
 
         # Attach main Widgets
@@ -36,13 +35,19 @@ class GoApp(Ui_Main, QtWidgets.QMainWindow):
         self.board.clickLocationSignal.connect(self.setMoves)
         self.board.nextPlayerColourSignal.connect(self.setNextPlayerColour)
         self.board.pointsSignal.connect(self.pointsAndTerritories)
+        self.board.timeOutSignal.connect(self.timeOutPlayer)
 
         self.pass_btn.clicked.connect(self.changeTurns)
+        self.undo_btn.clicked.connect(self.board.game_logic.undo)
         self.reset_btn.clicked.connect(self.resetGame)
 
         self.actionAbout.triggered.connect(self.aboutCall)
         self.actionAbout.setShortcut('Ctrl+A')
         self.actionAbout.setIcon(QIcon('./assets/about.png'))
+
+        self.newGame_action.triggered.connect(self.newGame)
+        self.saveGame_action.triggered.connect(self.board.saveGame)
+        self.openGame_action.triggered.connect(self.board.openGame)
 
         self.actionExit.triggered.connect(self.exitCall)
         self.actionExit.setShortcut('Ctrl+Q')
@@ -51,6 +56,9 @@ class GoApp(Ui_Main, QtWidgets.QMainWindow):
         self.actionHelp.setShortcut('Ctrl+H')
         self.actionHelp.setIcon(QIcon('./assets/help.png'))
 
+    def newGame(self):
+        window = GoApp(self)
+        window.show()
 
     def setMoves(self, pos):
         """increments the total move count"""
@@ -155,11 +163,12 @@ class GoApp(Ui_Main, QtWidgets.QMainWindow):
             # this may cause to a confusion, but game_logic.currentPlayerColour is always the next player
             # after the click on the board is finished
             self.setNextPlayerColour(self.board.game_logic.currentPlayerColour)
+            self.board.resetTimer()
 
     def pointsAndTerritories(self):
         """calculates player points and territories"""
-        self.black_points.setText("Black Points: " + str(self.board.game_logic.playerPoints[0]))
-        self.white_points.setText("White Points: " + str(self.board.game_logic.playerPoints[1]))
+        self.black_points.setText("Black: " + str(self.board.game_logic.playerPoints[0]))
+        self.white_points.setText("White: " + str(self.board.game_logic.playerPoints[1]))
 
         black_territories = 0
         white_territories = 0
@@ -167,8 +176,8 @@ class GoApp(Ui_Main, QtWidgets.QMainWindow):
             black_territories += row.count(self.board.BLACK)
             white_territories += row.count(self.board.WHITE)
 
-        self.black_territories.setText("Black Territories: " + str(black_territories))
-        self.white_territories.setText("White Territories: " + str(white_territories))
+        self.black_territories.setText("Black: " + str(black_territories))
+        self.white_territories.setText("White: " + str(white_territories))
 
     def resetGame(self, hideDialog):
         """resets the game board by clearing all states"""
@@ -182,6 +191,7 @@ class GoApp(Ui_Main, QtWidgets.QMainWindow):
                                                           QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No,
                                                           QtWidgets.QMessageBox.No)
             if button_reply == QtWidgets.QMessageBox.Yes:
+                self.board.resetTimer()
                 self.board.resetGame()
 
     def setNextPlayerColour(self, nextPlayer):
@@ -189,6 +199,17 @@ class GoApp(Ui_Main, QtWidgets.QMainWindow):
         print("Next Player: " + nextPlayer)
         self.next_player_label.setText("Next Player: " + nextPlayer)
 
+    def timeOutPlayer(self):
+        """gives turn to the other player"""
+        QtWidgets.QMessageBox.information(self,
+                                          "Timeout",
+                                          "Next Player's turn")
+        if self.board.game_logic.passTurn():
+            self.showWinnerDialog(self.board.game_logic.currentPlayerColour)
+        # this may cause to a confusion, but game_logic.currentPlayerColour is always the next player
+        # after the click on the board is finished
+        self.setNextPlayerColour(self.board.game_logic.currentPlayerColour)
+        self.board.resetTimer()
 
     def showWinnerDialog(self, player):
         """shows a dialog box when a user loses the game"""
@@ -196,7 +217,7 @@ class GoApp(Ui_Main, QtWidgets.QMainWindow):
         msg.setIcon(QMessageBox.Warning)
 
         msg.setText("Winner Detected")
-       # msg.setInformativeText(f"Player {player} lost the game!")
+        # msg.setInformativeText(f"Player {player} lost the game!")
         msg.setWindowTitle("Winner Detected")
         msg.setInformativeText(f"Player {player} lost the game!")
         msg.setDetailedText(f"Player {player} lost the game as this player passed his/her turn twice consecutively")
@@ -209,3 +230,23 @@ class GoApp(Ui_Main, QtWidgets.QMainWindow):
     def winnerConfirmation(self, i):
         """resets the game after the OK button is pressed on the dialog box"""
         self.resetGame(True)
+
+
+class GameSize(Ui_GameSize, QtWidgets.QDialog):
+
+    def __init__(self):
+        super(GameSize, self).__init__()
+        self.setupUi(self)
+        self.game_size = None
+
+        self.beginner_option.clicked.connect(lambda: self.setGameSize(7))
+        self.medium_option.clicked.connect(lambda: self.setGameSize(13))
+        self.expert_option.clicked.connect(lambda: self.setGameSize(19))
+
+    def setGameSize(self, val: int):
+        self.game_size = val
+
+    def accept(self) -> None:
+        go = GoApp(self.game_size)
+        go.show()
+        super(GameSize, self).accept()

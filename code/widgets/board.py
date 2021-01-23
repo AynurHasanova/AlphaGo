@@ -1,8 +1,17 @@
+import os
+import pickle
+from copy import deepcopy
+from pathlib import Path
+
+from PyQt5 import QtGui, QtCore, QtWidgets
 from PyQt5.QtCore import Qt, QBasicTimer, pyqtSignal, QPoint
 from PyQt5.QtGui import QPainter
 from PyQt5.QtWidgets import QFrame, QMessageBox
 
 from logic import GameLogic
+from utils import Color
+
+BASE_PATH = Path(__file__).resolve().parent.parent
 
 
 class Board(QFrame):
@@ -27,41 +36,65 @@ class Board(QFrame):
     updateTimerSignal = pyqtSignal(int)  # signal sent when timer is updated
     clickLocationSignal = pyqtSignal(str)  # signal sent when there is a new click location
     nextPlayerColourSignal = pyqtSignal(str)  # signal sent with the next player name
+    updateBoardSignal = pyqtSignal()  # signal sent to to update the board anytime
+    gameStartedSignal = pyqtSignal(bool)
+    timeOutSignal = pyqtSignal()
 
     def __init__(self, parent, board_width):
         super().__init__(parent)
         self.init_board(board_width)
 
+        # This will be used for saving the game to a file
+        self.isSaved = False
+        self.path = None
 
     def init_board(self, board_width):
         # start with a black player
         self.turn = self.BLACK
 
+        print(Color.WARNING + Color.BOLD, Path(__file__).resolve().parent.parent, Color.ENDLINE)
+
+        self.updateBoardSignal.connect(self.update)
+        self.gameStartedSignal.connect(self.setGameStarted)
+
         # create a timer for the game
         self.timer = QBasicTimer()
         self.isStarted = False
-
         self.board_width = self.board_height = board_width
-        self.game_logic = GameLogic(self.board_width)
+
+        self.board_array = [[0 for _ in range(board_width)] for _ in range(board_width)]
+        self.game_logic = GameLogic(self.board_array, self.updateBoardSignal)
+
+        # self.setBoardCursor()
 
         self.printBoardArray()
-
-        self.start()  # start the game which will start the timer
+        self.clearTimer()  # start the game which will start the timer
 
     def printBoardArray(self):
         """ prints the board_array in an attractive way """
         print("board_array:")
         print('\n'.join(['\t'.join([str(cell) for cell in row]) for row in self.game_logic.board_array]))
 
+    # TODO Add Animated and Custom Cursor
+    def setBoardCursor(self):
+        self.cursor_pix = QtGui.QBitmap(os.path.join(BASE_PATH, 'assets/help.png'))
+        self.current_curs = QtGui.QCursor(self.cursor_pix)
+        self.setCursor(self.current_curs)
+
     def squareWidth(self):
         """ returns the width of one square in the board """
         return self.SQUARE_SIZE
+
+    def setGameStarted(self, state):
+        self.isStarted = state
+        if state:
+            self.timer.stop()
 
     def squareHeight(self):
         """ returns the height of one square of the board """
         return self.SQUARE_SIZE
 
-    def start(self):
+    def clearTimer(self):
         """ Starts game """
         # set the boolean which determines if the game has started to TRUE
         self.isStarted = True
@@ -70,12 +103,19 @@ class Board(QFrame):
         self.timer.start(self.timerSpeed, self)
         print("start () - timer is started")
 
+    def resetTimer(self):
+        self.counter = Board.counter
+
+        # Here the timer is recreated so it will reset the timer to abs. zero
+        self.clearTimer()
+        self.updateTimerSignal.emit(self.counter)
+
     def timerEvent(self, event):
         """ This event is automatically called when the timer is updated. based on the timerSpeed variable """
         # TODO adapter this code to handle your timers
         if event.timerId() == self.timer.timerId():  # if the timer that has 'ticked' is the one in this class
-            if Board.counter == 0:
-                print("Game over")
+            if self.counter == 1:
+                self.timeOutSignal.emit()
             self.counter -= 1
             self.updateTimerSignal.emit(self.counter)
         else:
@@ -99,7 +139,7 @@ class Board(QFrame):
 
         clickLoc = f'{chr(65 + col - 1)}{row}'  # map to letter-number format
 
-        if (0 < row < 8) and (0 < col < 8):
+        if (0 < row < self.board_width + 1) and (0 < col < self.board_width + 1):
             tryValue = self.game_logic.tryMove(row - 1, col - 1)
             if tryValue == 0:
                 # if tryMove succeeds then update the next player colour
@@ -117,7 +157,43 @@ class Board(QFrame):
 
         self.clickLocationSignal.emit(clickLoc)
         self.pointsSignal.emit(self.game_logic.playerPoints)
+        self.resetTimer()
+        self.updateBoardSignal.emit()
+
+    def openGame(self):
+        # Get the file name
+        file_name, _ = QtWidgets.QFileDialog.getOpenFileName(self,
+                                                             "All files",
+                                                             QtCore.QDir.homePath(),
+                                                             "AlphaGo Game (*.alg);; Pickle File (*.pickle)")
+        with open(file_name, 'rb') as fp:
+            new_state = pickle.load(fp)
+        print(new_state)
+        self.game_logic.state = deepcopy(new_state)
+        self.nextPlayerColourSignal.emit(self.game_logic.currentPlayerColour)
         self.update()
+
+    def saveGame(self):
+        if not self.isSaved:
+            # Get the file name
+            file_name, _ = QtWidgets.QFileDialog.getSaveFileName(self,
+                                                                 "All files",
+                                                                 QtCore.QDir.homePath(),
+                                                                 "AlphaGo Game (*.alg);; Pickle File (*.pickle)")
+            # If the user cancelled the dialog
+            if not file_name:
+                QtWidgets.QMessageBox.warning(self, 'File Not given', 'No file was provided')
+            else:
+                # Copy the exact state of the state at that moment
+                state = deepcopy(self.game_logic.state)
+                try:
+                    with open(file_name, 'wb') as fp:
+                        pickle.dump(state, fp)
+                    self.isSaved = True
+                    self.path = file_name
+                    QtWidgets.QMessageBox.information(self, 'Successful', 'Your Game is now saved')
+                except OSError:
+                    QtWidgets.QMessageBox.critical(self, 'Error', 'An error occurred')
 
     def resetGame(self):
         """ Clears pieces from the board """
@@ -127,7 +203,7 @@ class Board(QFrame):
         self.pointsSignal.emit(self.game_logic.playerPoints)
         self.updateTimerSignal.emit(self.counter)
         # We need to call update to trigger paintEvent
-        self.update()
+        self.updateBoardSignal.emit()
 
     def drawSquares(self, painter):
         """ This method draws the board based on the given dimensions """

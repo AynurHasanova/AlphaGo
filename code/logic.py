@@ -1,5 +1,9 @@
 from copy import copy, deepcopy
 
+from PyQt5.QtCore import pyqtSignal
+
+from utils import Color
+
 
 class GameLogic:
     print("Game Logic Object Created")
@@ -13,8 +17,10 @@ class GameLogic:
         WHITE,
     )
 
-    def __init__(self, board_width):
-        self.board_array = [[0 for _ in range(board_width)] for _ in range(board_width)]
+    def __init__(self, board_array, update_signal: pyqtSignal):
+        self.board_array = board_array
+
+        self.updateSignal = update_signal
 
         # The blacks starts first by the rules
         self.current_player = self.BLACK
@@ -61,11 +67,15 @@ class GameLogic:
         self.is_started = True
         # Check if coordinates are occupied
         if self.board_array[x][y] is not self.FREE:
-            print('The coordinate is not free!')
+            print(Color.WARNING + Color.BOLD + 'The coordinate is not free!' + Color.ENDLINE)
             return 1
 
-        # Store state
+        print(Color.WARNING + Color.BOLD + f"x: {x}\ty: {y}" + Color.ENDLINE)
+
+        # First Save State
         self.saveData()
+
+        # Update the board_array
         self.board_array[x][y] = self.current_player
 
         # Check if any stones have been captured
@@ -312,6 +322,13 @@ class GameLogic:
         # if surrounding_coords was empty we reach here and return an empty set
         return set()
 
+    def undo(self):
+        try:
+            self.board_array, self.current_player, self.point = self.game_data.pop()
+        except IndexError:
+            return
+        self.updateSignal.emit()
+
     def getLiberties(self, x, y):
         """
         Collects the coordinates for liberties surrounding the group at the given
@@ -349,7 +366,6 @@ class GameLogic:
 
         return colour
 
-
     @property
     def playerPoints(self):
         """
@@ -363,3 +379,7 @@ class GameLogic:
         Returns the game state (board, current player, and points) as a tuple.
         """
         return deepcopy(self.board_array[:]), self.current_player, copy(self.point)
+
+    @state.setter
+    def state(self, value):
+        self.board_array, self.current_player, self.point = value
