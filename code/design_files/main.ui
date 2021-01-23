@@ -345,14 +345,13 @@
      <x>0</x>
      <y>0</y>
      <width>700</width>
-     <height>29</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="file_menu">
     <property name="title">
      <string>File</string>
     </property>
-    <addaction name="newGame_action"/>
     <addaction name="openGame_action"/>
     <addaction name="saveGame_action"/>
     <addaction name="actionExit"/>
@@ -368,14 +367,6 @@
    <addaction name="help_menu"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
-  <action name="newGame_action">
-   <property name="text">
-    <string>New Game</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+N</string>
-   </property>
-  </action>
   <action name="openGame_action">
    <property name="text">
     <string>Open Game</string>

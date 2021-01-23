@@ -22,9 +22,8 @@ class Board(QFrame):
     BLACK = 1
     WHITE = 2
 
-    # TODO set the board width and height to be square
     timerSpeed = 1000  # the timer updates every 1 second
-    counter = 100  # the number the counter will count down from
+    counter = 120  # each player has 2min (120 sec) to make a move
 
     TURNS = (
         BLACK,
@@ -77,6 +76,7 @@ class Board(QFrame):
 
     # TODO Add Animated and Custom Cursor
     def setBoardCursor(self):
+        """This was an attempt to set an animated cursor, it is not completed"""
         self.cursor_pix = QtGui.QBitmap(os.path.join(BASE_PATH, 'assets/help.png'))
         self.current_curs = QtGui.QCursor(self.cursor_pix)
         self.setCursor(self.current_curs)
@@ -86,6 +86,7 @@ class Board(QFrame):
         return self.SQUARE_SIZE
 
     def setGameStarted(self, state):
+        """Sets the game state as started"""
         self.isStarted = state
         if state:
             self.timer.stop()
@@ -104,6 +105,7 @@ class Board(QFrame):
         print("start () - timer is started")
 
     def resetTimer(self):
+        """Resets the players timer after they move"""
         self.counter = Board.counter
 
         # Here the timer is recreated so it will reset the timer to abs. zero
@@ -112,12 +114,12 @@ class Board(QFrame):
 
     def timerEvent(self, event):
         """ This event is automatically called when the timer is updated. based on the timerSpeed variable """
-        # TODO adapter this code to handle your timers
         if event.timerId() == self.timer.timerId():  # if the timer that has 'ticked' is the one in this class
             if self.counter == 1:
                 self.timeOutSignal.emit()
             self.counter -= 1
             self.updateTimerSignal.emit(self.counter)
+            print("self.counter = ", self.counter, ", current player: ", self.game_logic.currentPlayerColour)
         else:
             super(Board, self).timerEvent(event)  # if we do not handle an event we should pass it to the super
             # class for handling other wise pass it to the super class for handling
@@ -161,19 +163,25 @@ class Board(QFrame):
         self.updateBoardSignal.emit()
 
     def openGame(self):
+        """Opens a file with AlphaGo state and loads it into the board"""
         # Get the file name
         file_name, _ = QtWidgets.QFileDialog.getOpenFileName(self,
                                                              "All files",
                                                              QtCore.QDir.homePath(),
                                                              "AlphaGo Game (*.alg);; Pickle File (*.pickle)")
-        with open(file_name, 'rb') as fp:
-            new_state = pickle.load(fp)
-        print(new_state)
-        self.game_logic.state = deepcopy(new_state)
-        self.nextPlayerColourSignal.emit(self.game_logic.currentPlayerColour)
-        self.update()
+        if file_name:
+            with open(file_name, 'rb') as fp:
+                new_state = pickle.load(fp)
+            print(new_state)
+            # set game state to the one from the opened file
+            self.game_logic.state = deepcopy(new_state)
+            self.nextPlayerColourSignal.emit(self.game_logic.currentPlayerColour)
+            self.update()
+        else:
+            QtWidgets.QMessageBox.warning(self, 'File Not given', 'No file was provided')
 
     def saveGame(self):
+        """Saves the gamem state into a file"""
         if not self.isSaved:
             # Get the file name
             file_name, _ = QtWidgets.QFileDialog.getSaveFileName(self,
